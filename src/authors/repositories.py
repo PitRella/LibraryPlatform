@@ -10,7 +10,7 @@ class AuthorRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    async def insert_author(self, params: dict[str, Any]) -> int:
+    async def create_object(self, params: dict[str, Any]) -> int:
         sql = text(
             """
             INSERT INTO authors (email, password, name, biography,
