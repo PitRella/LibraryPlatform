@@ -13,7 +13,7 @@ from src.books.schemas import (
     CreateBookRequestSchema,
     GetBookResponseSchema,
     UpdateBookRequestSchema,
-    CreateBookResponseSchema
+    CreateBookResponseSchema, UploadedBooksResponseSchema
 )
 from src.books.services import BooksService
 
@@ -142,5 +142,6 @@ async def import_books(
         author: Annotated[dict[str, Any], Depends(get_author_from_token)],
         service: Annotated[BooksService, Depends(get_service(BooksService))],
         file: UploadFile = File(..., description="Books file (JSON or CSV)"),
-) -> dict[str, Any]:
-    book_id = await service.import_books(author, file)
+) -> UploadedBooksResponseSchema:
+    books_info = await service.import_books(author, file)
+    return UploadedBooksResponseSchema.model_validate(books_info.to_dict())

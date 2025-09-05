@@ -57,3 +57,8 @@ class GetBookResponseSchema(BaseSchema):
     language: BookLanguage
     published_year: int
 
+
+class UploadedBooksResponseSchema(BaseSchema):
+    imported: int
+    book_ids: list[int]
+

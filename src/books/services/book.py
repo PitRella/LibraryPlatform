@@ -3,6 +3,7 @@ from datetime import datetime as dt, timezone
 from src.base.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.books.dto import ImportedBooksDTO
 from src.books.exceptions import BookPermissionException, BookNotFoundException
 from src.books.repositories import BookRepository
 from src.books.schemas import CreateBookRequestSchema, UpdateBookRequestSchema
@@ -116,10 +117,14 @@ class BooksService(BaseService):
             params["published_year"] = published_year
         return await self._repo.list_objects(filters, params)
 
-    async def import_books(self, author: dict[str, Any], file: UploadFile):
+    async def import_books(
+            self,
+            author: dict[str, Any],
+            file: UploadFile
+    ) -> ImportedBooksDTO:
         importer = BookImporterFactory.get_importer(file)
         books_to_create = await importer.parse(file)
-        created_ids = []
+        created_ids: list[int] = []
         for f_book_data in books_to_create:
             book_data = self._format_book_data(
                 author,
@@ -127,5 +132,7 @@ class BooksService(BaseService):
             )
             book_id = await self._repo.create_object(book_data)
             created_ids.append(book_id)
-
-        return {"imported": len(created_ids), "book_ids": created_ids}
+        return ImportedBooksDTO(
+            imported=len(created_ids),
+            book_ids=created_ids
+        )
