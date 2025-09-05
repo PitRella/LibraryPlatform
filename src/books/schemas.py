@@ -62,3 +62,8 @@ class UploadedBooksResponseSchema(BaseSchema):
     imported: int
     book_ids: list[int]
 
+
+class GetBooksListResponseSchema(BaseSchema):
+    items: list[GetBookResponseSchema]
+    next_cursor: int | None
+

@@ -13,7 +13,7 @@ from src.books.schemas import (
     CreateBookRequestSchema,
     GetBookResponseSchema,
     UpdateBookRequestSchema,
-    CreateBookResponseSchema, UploadedBooksResponseSchema
+    CreateBookResponseSchema, UploadedBooksResponseSchema, GetBooksListResponseSchema
 )
 from src.books.services import BooksService
 
@@ -46,9 +46,21 @@ async def get_all_books(
             description='Book published year',
             examples=[1985, 2022],
         ),
+        year_from: int | None = Query(
+            None,
+            ge=1800,
+            le=dt.now().year,
+            description='Filter books published from this year (inclusive)'
+        ),
+        year_to: int | None = Query(
+            None,
+            ge=1800,
+            le=dt.now().year,
+            description='Filter books published up to this year (inclusive)'
+        ),
         author_id: int | None = Query(None, ge=0),
-) -> list[GetBookResponseSchema] | None:
-    books = await service.get_all_books(
+) -> GetBooksListResponseSchema:
+    books_result = await service.get_all_books(
         limit=limit,
         cursor=cursor,
         title=title,
@@ -56,8 +68,13 @@ async def get_all_books(
         language=language,
         published_year=published_year,
         author_id=author_id,
+        year_from=year_from,
+        year_to=year_to,
     )
-    return [GetBookResponseSchema.model_validate(b) for b in books]
+    return GetBooksListResponseSchema(
+        items=[GetBookResponseSchema.model_validate(b) for b in books_result["items"]],
+        next_cursor=books_result["next_cursor"],
+    )
 
 
 @books_router.post(

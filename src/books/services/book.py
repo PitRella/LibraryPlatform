@@ -92,10 +92,12 @@ class BooksService(BaseService):
             language: str | None = None,
             published_year: int | None = None,
             author_id: int | None = None,
-    ) -> list[dict[str, Any]]:
+            year_from: int | None = None,
+            year_to: int | None = None,
+    ) -> dict[str, Any]:
 
-        filters = []
-        params: dict[str, Any] = {"limit": limit}
+        filters: list[str] = []
+        params: dict[str, Any] = {"limit": limit + 1}
 
         if cursor is not None:
             filters.append("id > :cursor")
@@ -115,7 +117,17 @@ class BooksService(BaseService):
         if published_year is not None:
             filters.append("published_year = :published_year")
             params["published_year"] = published_year
-        return await self._repo.list_objects(filters, params)
+        if year_from is not None:
+            filters.append("published_year >= :year_from")
+            params["year_from"] = year_from
+        if year_to is not None:
+            filters.append("published_year <= :year_to")
+            params["year_to"] = year_to
+
+        rows = await self._repo.list_objects(filters, params)
+        items = rows[:limit]
+        next_cursor = items[-1]['id'] if len(rows) > limit else None
+        return {"items": items, "next_cursor": next_cursor}
 
     async def import_books(
             self,
