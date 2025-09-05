@@ -1,7 +1,9 @@
 """Response examples for auth endpoints."""
 
+from typing import Any
+
 # Common responses
-UNAUTHORIZED_RESPONSE = {
+UNAUTHORIZED_RESPONSE: dict[int, dict[str, Any]] = {
     401: {
         'description': 'Unauthorized - Invalid or missing token',
         'content': {
@@ -12,7 +14,7 @@ UNAUTHORIZED_RESPONSE = {
     }
 }
 
-VALIDATION_ERROR_RESPONSE = {
+VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
     422: {
         'description': 'Validation Error',
         'content': {
@@ -33,7 +35,7 @@ VALIDATION_ERROR_RESPONSE = {
 }
 
 # Auth specific responses
-LOGIN_RESPONSES = {
+LOGIN_RESPONSES: dict[int, dict[str, Any]] = {
     200: {
         'description': 'Successfully authenticated',
         'content': {
@@ -57,7 +59,7 @@ LOGIN_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-GET_ME_RESPONSES = {
+GET_ME_RESPONSES: dict[int, dict[str, Any]] = {
     200: {
         'description': 'Successfully retrieved user profile',
         'content': {
@@ -65,7 +67,9 @@ GET_ME_RESPONSES = {
                 'example': {
                     'email': 'author@example.com',
                     'name': 'John Smith',
-                    'biography': 'I am a passionate writer who loves creating worlds.',
+                    'biography': (
+                        'I am a passionate writer who loves creating worlds.'
+                    ),
                     'birth_year': 1985,
                     'nationality': 'United Kingdom',
                 }
@@ -75,7 +79,7 @@ GET_ME_RESPONSES = {
     **UNAUTHORIZED_RESPONSE,
 }
 
-REFRESH_TOKEN_RESPONSES = {
+REFRESH_TOKEN_RESPONSES: dict[int, dict[str, Any]] = {
     200: {
         'description': 'Successfully refreshed tokens',
         'content': {
@@ -99,7 +103,7 @@ REFRESH_TOKEN_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-LOGOUT_RESPONSES = {
+LOGOUT_RESPONSES: dict[int, dict[str, Any]] = {
     204: {'description': 'Successfully logged out'},
     401: {
         'description': 'Invalid or expired refresh token',

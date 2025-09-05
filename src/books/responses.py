@@ -1,7 +1,9 @@
 """Response examples for books endpoints."""
 
+from typing import Any
+
 # Common responses
-UNAUTHORIZED_RESPONSE = {
+UNAUTHORIZED_RESPONSE: dict[int, dict[str, Any]] = {
     401: {
         'description': 'Unauthorized - Invalid or missing token',
         'content': {
@@ -12,7 +14,7 @@ UNAUTHORIZED_RESPONSE = {
     }
 }
 
-VALIDATION_ERROR_RESPONSE = {
+VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
     422: {
         'description': 'Validation Error',
         'content': {
@@ -32,7 +34,7 @@ VALIDATION_ERROR_RESPONSE = {
     }
 }
 
-NOT_FOUND_RESPONSE = {
+NOT_FOUND_RESPONSE: dict[int, dict[str, Any]] = {
     404: {
         'description': 'Book not found',
         'content': {
@@ -43,7 +45,7 @@ NOT_FOUND_RESPONSE = {
     }
 }
 
-FORBIDDEN_RESPONSE = {
+FORBIDDEN_RESPONSE: dict[int, dict[str, Any]] = {
     403: {
         'description': 'Forbidden - Not the author of this book',
         'content': {
@@ -55,7 +57,7 @@ FORBIDDEN_RESPONSE = {
 }
 
 # Books specific responses
-GET_BOOKS_RESPONSES = {
+GET_BOOKS_RESPONSES: dict[int, dict[str, Any]] = {
     200: {
         'description': 'Successfully retrieved books list',
         'content': {
@@ -86,7 +88,7 @@ GET_BOOKS_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-CREATE_BOOK_RESPONSES = {
+CREATE_BOOK_RESPONSES: dict[int, dict[str, Any]] = {
     201: {
         'description': 'Book successfully created',
         'content': {'application/json': {'example': {'id': 1}}},
@@ -103,7 +105,7 @@ CREATE_BOOK_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-GET_BOOK_RESPONSES = {
+GET_BOOK_RESPONSES: dict[int, dict[str, Any]] = {
     200: {
         'description': 'Book successfully retrieved',
         'content': {
@@ -122,7 +124,7 @@ GET_BOOK_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-UPDATE_BOOK_RESPONSES = {
+UPDATE_BOOK_RESPONSES: dict[int, dict[str, Any]] = {
     200: {
         'description': 'Book successfully updated',
         'content': {
@@ -143,7 +145,7 @@ UPDATE_BOOK_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-DELETE_BOOK_RESPONSES = {
+DELETE_BOOK_RESPONSES: dict[int, dict[str, Any]] = {
     204: {'description': 'Book successfully deleted'},
     **UNAUTHORIZED_RESPONSE,
     **FORBIDDEN_RESPONSE,
@@ -151,7 +153,7 @@ DELETE_BOOK_RESPONSES = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-IMPORT_BOOKS_RESPONSES = {
+IMPORT_BOOKS_RESPONSES: dict[int, dict[str, Any]] = {
     201: {
         'description': 'Books successfully imported',
         'content': {
@@ -165,7 +167,9 @@ IMPORT_BOOKS_RESPONSES = {
         'content': {
             'application/json': {
                 'example': {
-                    'detail': 'Invalid file format. Only JSON and CSV are supported.'
+                    'detail': (
+                        'Invalid file format. Only JSON and CSV are supported.'
+                    )
                 }
             }
         },

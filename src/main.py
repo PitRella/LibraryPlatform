@@ -20,7 +20,7 @@ app = FastAPI(
     version='1.0.0',
     contact={'name': 'Serhii Kryvtsun', 'tg': '@pitrella'},
 )
-app.add_middleware(GlobalExceptionMiddleware)  # type: ignore
+app.add_middleware(GlobalExceptionMiddleware)
 
 main_api_router = APIRouter(prefix='/api/v1')
 main_api_router.include_router(author_router)

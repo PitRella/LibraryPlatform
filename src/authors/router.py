@@ -16,7 +16,9 @@ author_router = APIRouter(prefix='/author', tags=['author'])
 @author_router.post(
     '/',
     summary='Create a new author',
-    description='Create a new author account with email, password, and profile information.',
+    description=(
+        'Create a new author account with email, password, and profile info.'
+    ),
     status_code=201,
     responses=CREATE_AUTHOR_RESPONSES,
 )

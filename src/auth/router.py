@@ -25,7 +25,9 @@ settings = Settings.load()
     path='/login',
     response_model=TokenSchemas,
     summary='User login',
-    description='Authenticate user with email and password to get access and refresh tokens.',
+    description=(
+        'Authenticate user with email and password to get access to tokens.'
+    ),
     responses=LOGIN_RESPONSES,
 )
 async def login_user(
@@ -53,7 +55,9 @@ async def login_user(
 @auth_router.get(
     path='/me',
     summary='Get current user profile',
-    description="Retrieve the current authenticated author's profile information.",
+    description=(
+        "Retrieve the current authenticated author's profile information."
+    ),
     responses=GET_ME_RESPONSES,
 )
 async def get_me(
@@ -75,7 +79,7 @@ async def get_me(
     path='/refresh',
     response_model=TokenSchemas,
     summary='Refresh access token',
-    description='Get new access and refresh tokens using a valid refresh token.',
+    description='Get new access and refresh tokens using a valid one.',
     responses=REFRESH_TOKEN_RESPONSES,
 )
 async def refresh_token(

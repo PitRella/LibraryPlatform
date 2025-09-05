@@ -1,7 +1,9 @@
 """Response examples for authors endpoints."""
 
+from typing import Any
+
 # Common responses
-VALIDATION_ERROR_RESPONSE = {
+VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
     422: {
         'description': 'Validation Error',
         'content': {
@@ -22,7 +24,7 @@ VALIDATION_ERROR_RESPONSE = {
 }
 
 # Authors specific responses
-CREATE_AUTHOR_RESPONSES = {
+CREATE_AUTHOR_RESPONSES: dict[int, dict[str, Any]] = {
     201: {
         'description': 'Author successfully created',
         'content': {'application/json': {'example': {'id': 1}}},
