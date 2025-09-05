@@ -16,3 +16,11 @@ class BadPasswordSchemaException(AuthorException):
             'one lowercase letter, one digit, and one special '
             'character @$!%*?&.',
         )
+
+class AuthorNotFoundByIdException(AuthorException):
+
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=404,
+            detail='Author by this id not found.',
+        )
