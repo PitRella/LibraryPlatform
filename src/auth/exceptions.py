@@ -2,31 +2,58 @@ from fastapi import HTTPException
 
 
 class AuthorizationException(HTTPException):
-    """Base exception for auth-related errors."""
+    """Base exception for all authentication-related errors."""
 
 
 class WrongCredentialsException(AuthorizationException):
-    """Custom exception for when wrong credentials are provided."""
+    """Exception raised when provided credentials are invalid.
+
+    Attributes:
+        status_code (int): HTTP status code for the exception (401 Unauthorized).
+        detail (str): Human-readable explanation of the error.
+
+    """
 
     def __init__(self) -> None:
-        """Initialize the WrongCredentialsException with status 404."""
+        """Initialize WrongCredentialsException with default message and status."""
         super().__init__(
-            status_code=404,
-            detail='User with this credentials can not be found',
+            status_code=401,
+            detail='Invalid credentials provided',
         )
 
 
-class AccessTokenExpiredException(HTTPException):
-    def __init__(self) -> None:
-        super().__init__(status_code=404, detail='Access token expired')
+class AccessTokenExpiredException(AuthorizationException):
+    """Exception raised when an access token has expired.
 
+    Attributes:
+        status_code (int): HTTP status code for the exception (401 Unauthorized).
+        detail (str): Human-readable explanation indicating token expiry.
 
-class RefreshTokenException(HTTPException):
+    """
+
     def __init__(self) -> None:
+        """Initialize AccessTokenExpiredException with default message."""
         super().__init__(
-            status_code=404,
-            detail='Cannot process refresh '
-            'token. Probably token '
-            "expired, doesn't exist or"
-            ' attached to deleted user.',
+            status_code=401,
+            detail='Access token has expired',
+        )
+
+
+class RefreshTokenException(AuthorizationException):
+    """Exception raised when a refresh token is invalid, expired, or cannot be processed.
+
+    Attributes:
+        status_code (int): HTTP status code for the exception (403 Forbidden).
+        detail (str): Human-readable explanation of the failure.
+
+    """
+
+    def __init__(self) -> None:
+        """Initialize RefreshTokenException with default message."""
+        super().__init__(
+            status_code=403,
+            detail=(
+                'Cannot process refresh token. It may be expired, invalid, '
+                'or attached to a deleted user.'
+            ),
         )
