@@ -1,8 +1,8 @@
 import logging
 import uuid
 from datetime import datetime, timezone
-from typing import Callable, Awaitable
-
+from fastapi import HTTPException
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi import Request
 from fastapi.responses import JSONResponse, Response
 from starlette.types import ASGIApp
@@ -26,7 +26,11 @@ class GlobalExceptionMiddleware:
 
         try:
             await self.app(scope, receive, send)
-        except Exception:
+        except Exception as exc:
+            if isinstance(exc, (HTTPException, StarletteHTTPException)):
+                # Re-raise HTTP exceptions so they can be handled properly
+                raise
+            
             logger.exception("Unhandled exception (request_id=%s)", request_id)
             now = datetime.now(timezone.utc).isoformat()
             response = JSONResponse(
@@ -39,3 +43,5 @@ class GlobalExceptionMiddleware:
                 },
             )
             await response(scope, receive, send)
+
+
