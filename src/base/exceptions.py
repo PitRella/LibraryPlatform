@@ -3,11 +3,11 @@
 from fastapi import HTTPException
 
 
-class BaseException(HTTPException):
+class BaseApplicationException(HTTPException):
     """Base exception for all application errors."""
 
 
-class UnknownTableException(BaseException):
+class UnknownTableException(BaseApplicationException):
     """Raised when an unknown table is referenced."""
 
     def __init__(self, table_name: str) -> None:
@@ -23,7 +23,7 @@ class UnknownTableException(BaseException):
         )
 
 
-class ColumnNotAllowedException(BaseException):
+class ColumnNotAllowedException(BaseApplicationException):
     """Raised when a column is not allowed for a table."""
 
     def __init__(self, column_name: str, table_name: str) -> None:
@@ -36,11 +36,12 @@ class ColumnNotAllowedException(BaseException):
         """
         super().__init__(
             status_code=400,
-            detail=f"Column '{column_name}' not allowed for table '{table_name}'",
+            detail=f"Column '{column_name}' not allowed"
+            f" for table '{table_name}'",
         )
 
 
-class OperatorNotAllowedException(BaseException):
+class OperatorNotAllowedException(BaseApplicationException):
     """Raised when an operator is not allowed."""
 
     def __init__(self, operator: str) -> None:
@@ -56,7 +57,7 @@ class OperatorNotAllowedException(BaseException):
         )
 
 
-class ParameterNotFoundException(BaseException):
+class ParameterNotFoundException(BaseApplicationException):
     """Raised when a required parameter is not found."""
 
     def __init__(self, param_name: str) -> None:
@@ -72,7 +73,7 @@ class ParameterNotFoundException(BaseException):
         )
 
 
-class NoFieldsForUpdateException(BaseException):
+class NoFieldsForUpdateException(BaseApplicationException):
     """Raised when no fields are provided for update."""
 
     def __init__(self) -> None:
