@@ -1,9 +1,10 @@
+from abc import abstractmethod, ABC
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class BaseRepository:
+class BaseRepository: # TODO: Add ABC
     def __init__(self, session: AsyncSession):
         self._session = session
 
@@ -24,4 +25,13 @@ class BaseRepository:
             self,
             **filters: Any
     ) -> None:
+        pass
+
+class ListableRepository(ABC):
+    @abstractmethod
+    async def list_objects(
+            self,
+            limit: int = 10,
+            cursor: int | None = None
+    ) -> list[dict[str, Any]] | None:
         pass
