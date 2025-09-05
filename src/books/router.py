@@ -12,7 +12,11 @@ from src.books.service import BooksService
 books_router = APIRouter(prefix='/books', tags=['books'])
 
 
-@books_router.get('/all')
+@books_router.get(
+    '/all',
+    summary='Get all books',
+    description='Retrieve all books by filters'
+)
 async def get_all_books(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
         limit: int = Query(10, gt=0, le=100, description='Limit of books'),
@@ -48,8 +52,11 @@ async def get_all_books(
     return [GetBookResponseSchema.model_validate(b) for b in books]
 
 
-@books_router.post('/',
-                   description='Create a new book.')
+@books_router.post(
+    '/',
+    summary='Create a new book.',
+    description='Create a new book by author.'
+)
 async def create_book(
         author: Annotated[
             dict[str, Any], Depends(get_author_from_token)
@@ -61,10 +68,19 @@ async def create_book(
     return CreateBookResponseSchema(id=book_id)
 
 
-@books_router.get('/{book_id}', description='Get a book')
+@books_router.get(
+    '/{book_id}',
+    summary='Get a book.',
+    description='Get a book published by author.',
+)
 async def get_book(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
-        book_id: int = Path(..., ge=1, description='Book ID'),
+        book_id: int = Path(
+            ...,
+            ge=1,
+            description='Book ID',
+            examples=[1, 2, 3],
+        ),
 ) -> GetBookResponseSchema:
     book_data = await service.get_book(book_id)
     return GetBookResponseSchema.model_validate(book_data)
@@ -77,7 +93,12 @@ async def update_book(
         ],
         update_book_schema: UpdateBookRequestSchema,
         service: Annotated[BooksService, Depends(get_service(BooksService))],
-        book_id: int = Path(..., ge=1, description='Book ID'),
+        book_id: int = Path(
+            ...,
+            ge=1,
+            description='Book ID',
+            examples=[1, 2, 3],
+        ),
 ) -> GetBookResponseSchema:
     updated_book = await service.update_book(
         author=author,
