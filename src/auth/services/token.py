@@ -1,10 +1,11 @@
 import uuid
 from calendar import timegm
 from datetime import UTC, datetime, timedelta
-from typing import Any, TypedDict
+from typing import Any
 
 from jose import JWTError, jwt
 
+from src.auth.dto import AccessTokenDTO
 from src.auth.exceptions import (
     AccessTokenExpiredException,
     RefreshTokenException,
@@ -15,13 +16,14 @@ from src.settings import Settings
 settings = Settings.load()
 
 
-class AccessTokenDict(TypedDict):
-    sub: str
-    exp: datetime
-
-
 class TokenManager:
     """Manager for creating, decoding, and validating JWT access and refresh tokens."""
+
+    @staticmethod
+    def _get_expiration_delta() -> datetime:
+        return datetime.now(UTC) + timedelta(
+            minutes=settings.token_settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        )
 
     @classmethod
     def generate_access_token(cls, author_id: int) -> str:
@@ -34,15 +36,11 @@ class TokenManager:
             str: Encoded JWT access token.
 
         """
-        to_encode: AccessTokenDict = {
-            'sub': str(author_id),
-            'exp': datetime.now(UTC)
-            + timedelta(
-                minutes=settings.token_settings.ACCESS_TOKEN_EXPIRE_MINUTES
-            ),
-        }
+        to_encode = AccessTokenDTO(
+            sub=str(author_id), exp=cls._get_expiration_delta()
+        )
         encoded_jwt: str = jwt.encode(
-            to_encode,
+            to_encode.to_dict(),
             settings.token_settings.SECRET_KEY,
             algorithm=settings.token_settings.ALGORITHM,
         )

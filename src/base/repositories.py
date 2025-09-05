@@ -26,7 +26,7 @@ class BaseRepository(ABC):
         self._session = session
 
     @abstractmethod
-    async def create_object(self, params: dict[str, Any]):
+    async def create_object(self, params: dict[str, Any]) -> int:
         """Create a new object in the repository.
 
         Args:
