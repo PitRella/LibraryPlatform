@@ -1,6 +1,7 @@
 import uuid
 from calendar import timegm
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from jose import JWTError, jwt
 
@@ -9,7 +10,6 @@ from src.auth.exceptions import (
     RefreshTokenException,
     WrongCredentialsException,
 )
-from src.auth.models import RefreshToken
 from src.settings import Settings
 
 settings = Settings.load()
