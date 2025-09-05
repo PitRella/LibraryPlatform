@@ -36,6 +36,7 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        """Return the database URL."""
         return (
             f'postgresql+asyncpg://{self.USER}:{self.PASSWORD}'
             f'@{self.HOST}:{self.PORT}/{self.NAME}'
