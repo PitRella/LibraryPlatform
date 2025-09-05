@@ -3,7 +3,7 @@
 from typing import Any
 
 # Common responses
-VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
+VALIDATION_ERROR_RESPONSE: dict[int | str, dict[str, Any]] = {
     422: {
         'description': 'Validation Error',
         'content': {
@@ -24,7 +24,7 @@ VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
 }
 
 # Authors specific responses
-CREATE_AUTHOR_RESPONSES: dict[int, dict[str, Any]] = {
+CREATE_AUTHOR_RESPONSES: dict[int | str, dict[str, Any]] = {
     201: {
         'description': 'Author successfully created',
         'content': {'application/json': {'example': {'id': 1}}},

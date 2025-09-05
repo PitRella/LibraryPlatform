@@ -3,7 +3,7 @@
 from typing import Any
 
 # Common responses
-UNAUTHORIZED_RESPONSE: dict[int, dict[str, Any]] = {
+UNAUTHORIZED_RESPONSE: dict[int | str, dict[str, Any]] = {
     401: {
         'description': 'Unauthorized - Invalid or missing token',
         'content': {
@@ -14,7 +14,7 @@ UNAUTHORIZED_RESPONSE: dict[int, dict[str, Any]] = {
     }
 }
 
-VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
+VALIDATION_ERROR_RESPONSE: dict[int | str, dict[str, Any]] = {
     422: {
         'description': 'Validation Error',
         'content': {
@@ -35,7 +35,7 @@ VALIDATION_ERROR_RESPONSE: dict[int, dict[str, Any]] = {
 }
 
 # Auth specific responses
-LOGIN_RESPONSES: dict[int, dict[str, Any]] = {
+LOGIN_RESPONSES: dict[int | str, dict[str, Any]] = {
     200: {
         'description': 'Successfully authenticated',
         'content': {
@@ -59,7 +59,7 @@ LOGIN_RESPONSES: dict[int, dict[str, Any]] = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-GET_ME_RESPONSES: dict[int, dict[str, Any]] = {
+GET_ME_RESPONSES: dict[int | str, dict[str, Any]] = {
     200: {
         'description': 'Successfully retrieved user profile',
         'content': {
@@ -79,7 +79,7 @@ GET_ME_RESPONSES: dict[int, dict[str, Any]] = {
     **UNAUTHORIZED_RESPONSE,
 }
 
-REFRESH_TOKEN_RESPONSES: dict[int, dict[str, Any]] = {
+REFRESH_TOKEN_RESPONSES: dict[int | str, dict[str, Any]] = {
     200: {
         'description': 'Successfully refreshed tokens',
         'content': {
@@ -103,7 +103,7 @@ REFRESH_TOKEN_RESPONSES: dict[int, dict[str, Any]] = {
     **VALIDATION_ERROR_RESPONSE,
 }
 
-LOGOUT_RESPONSES: dict[int, dict[str, Any]] = {
+LOGOUT_RESPONSES: dict[int | str, dict[str, Any]] = {
     204: {'description': 'Successfully logged out'},
     401: {
         'description': 'Invalid or expired refresh token',
