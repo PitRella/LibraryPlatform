@@ -143,37 +143,4 @@ async def import_books(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
         file: UploadFile = File(..., description="Books file (JSON or CSV)"),
 ) -> dict[str, Any]:
-    content = await file.read()
-    books_to_create = []
-    try:
-        if file.filename.endswith(".json"):
-            data = json.loads(content.decode("utf-8"))
-            if not isinstance(data, list):
-                raise ValueError("JSON file must contain an array of books")
-            books_to_create = data
-
-        elif file.filename.endswith(".csv"):
-            reader = csv.DictReader(StringIO(content.decode("utf-8")))
-            books_to_create = list(reader)
-
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Unsupported file format. Use .json or .csv"
-            )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Failed to parse file: {e}"
-        )
-
-    created_ids: list[int] = []
-    for book in books_to_create:
-        schema = CreateBookRequestSchema(**book)
-        book_id = await service.create_book(author, schema)
-        created_ids.append(book_id)
-
-    return {
-        "imported": len(created_ids),
-        "book_ids": created_ids
-    }
+    book_id = await service.import_books(author, file)

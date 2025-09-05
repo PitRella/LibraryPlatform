@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.books.exceptions import BookPermissionException, BookNotFoundException
 from src.books.repositories import BookRepository
 from src.books.schemas import CreateBookRequestSchema, UpdateBookRequestSchema
+from fastapi import UploadFile
+from src.books.services.importers import BookImporterFactory
 
 
 class BooksService(BaseService):
@@ -24,14 +26,22 @@ class BooksService(BaseService):
         if not book or author['id'] != book['author_id']:
             raise BookPermissionException
 
+    @staticmethod
+    def _format_book_data(
+            author: dict[str, Any],
+            book_schema: CreateBookRequestSchema
+    ) -> dict[str, Any]:
+        book_data = book_schema.model_dump()
+        book_data['author_id'] = author['id']
+        book_data['created_at'] = dt.now(timezone.utc)
+        return book_data
+
     async def create_book(
             self,
             author: dict[str, Any],
             book_schema: CreateBookRequestSchema,
     ) -> int:
-        book_data = book_schema.model_dump()
-        book_data['author_id'] = author['id']
-        book_data['created_at'] = dt.now(timezone.utc)
+        book_data = self._format_book_data(author, book_schema)
         book_id: int = await self._repo.create_object(book_data)
         return book_id
 
@@ -105,3 +115,17 @@ class BooksService(BaseService):
             filters.append("published_year = :published_year")
             params["published_year"] = published_year
         return await self._repo.list_objects(filters, params)
+
+    async def import_books(self, author: dict[str, Any], file: UploadFile):
+        importer = BookImporterFactory.get_importer(file)
+        books_to_create = await importer.parse(file)
+        created_ids = []
+        for f_book_data in books_to_create:
+            book_data = self._format_book_data(
+                author,
+                CreateBookRequestSchema(**f_book_data)
+            )
+            book_id = await self._repo.create_object(book_data)
+            created_ids.append(book_id)
+
+        return {"imported": len(created_ids), "book_ids": created_ids}
