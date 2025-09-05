@@ -87,7 +87,7 @@ class AuthService(BaseService):
 
     async def logout_user(
             self,
-            refresh_token: str | None,
+            refresh_token: uuid.UUID | None,
     ) -> None:
         if not refresh_token:
             raise RefreshTokenException
