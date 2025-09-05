@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any
 
 from src.base.dto import BaseDTO
@@ -22,6 +22,8 @@ class GetBooksParamsResponseDTO(BaseDTO):
     published_year: int | None = None
     year_from: int | None = None
     year_to: int | None = None
+
+
 @dataclass
 class GetBooksResponseDTO(BaseDTO):
     items: list[dict[str, Any]]

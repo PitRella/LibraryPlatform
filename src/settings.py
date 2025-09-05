@@ -15,10 +15,7 @@ COMMON_CONFIG = SettingsConfigDict(
 class TokenSettings(BaseSettings):
     """Token-related settings."""
 
-    model_config = SettingsConfigDict(
-        **COMMON_CONFIG,
-        env_prefix='TOKEN_'
-    )
+    model_config = SettingsConfigDict(**COMMON_CONFIG, env_prefix='TOKEN_')
 
     SECRET_KEY: str = ''
     ALGORITHM: str = 'HS256'
@@ -28,10 +25,8 @@ class TokenSettings(BaseSettings):
 
 class DatabaseSettings(BaseSettings):
     """Database-related settings."""
-    model_config = SettingsConfigDict(
-        **COMMON_CONFIG,
-        env_prefix='DB_'
-    )
+
+    model_config = SettingsConfigDict(**COMMON_CONFIG, env_prefix='DB_')
 
     HOST: str
     PORT: int
@@ -42,17 +37,15 @@ class DatabaseSettings(BaseSettings):
     @property
     def database_url(self) -> str:
         return (
-            f"postgresql+asyncpg://{self.USER}:{self.PASSWORD}"
-            f"@{self.HOST}:{self.PORT}/{self.NAME}"
+            f'postgresql+asyncpg://{self.USER}:{self.PASSWORD}'
+            f'@{self.HOST}:{self.PORT}/{self.NAME}'
         )
 
 
 class LoggingSettings(BaseSettings):
     """Logging-related settings."""
-    model_config = SettingsConfigDict(
-        **COMMON_CONFIG,
-        env_prefix='LOGGING_'
-    )
+
+    model_config = SettingsConfigDict(**COMMON_CONFIG, env_prefix='LOGGING_')
 
     SENTRY_URL: str = ''
 
@@ -68,15 +61,11 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = 'INFO'
     APP_MODE: str = 'dev'
     # Nested settings
-    token_settings: TokenSettings = Field(
-        default_factory=TokenSettings
-    )
+    token_settings: TokenSettings = Field(default_factory=TokenSettings)
     database_settings: DatabaseSettings = Field(
         default_factory=DatabaseSettings
     )
-    logging_settings: LoggingSettings = Field(
-        default_factory=LoggingSettings
-    )
+    logging_settings: LoggingSettings = Field(default_factory=LoggingSettings)
 
     @classmethod
     @cache

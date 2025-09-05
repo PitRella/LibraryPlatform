@@ -6,18 +6,21 @@ class BookException(HTTPException):
 
 
 class ForgottenParametersException(BookException):
-
     def __init__(self) -> None:
         super().__init__(
             status_code=400,
             detail='No fields provided for update',
         )
+
+
 class BookNotFoundException(BookException):
     def __init__(self) -> None:
         super().__init__(
             status_code=404,
             detail='Book was not found',
         )
+
+
 class BookPermissionException(BookException):
     def __init__(self) -> None:
         super().__init__(
@@ -52,5 +55,7 @@ class ImportInvalidCSVStructureException(ImportBadRequestException):
 
 
 class ImportItemValidationException(ImportBadRequestException):
-    def __init__(self, detail: str = 'Invalid book data in imported file') -> None:
+    def __init__(
+        self, detail: str = 'Invalid book data in imported file'
+    ) -> None:
         super().__init__(detail)

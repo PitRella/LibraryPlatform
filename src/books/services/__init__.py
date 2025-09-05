@@ -1,3 +1,3 @@
 from .book import BooksService
 
-__all__ = ['BooksService',]
+__all__ = ['BooksService']

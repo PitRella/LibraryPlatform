@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,17 +18,14 @@ class BaseRepository(ABC):
 
     @abstractmethod
     async def update_object(
-            self,
-            update_data: dict[str, Any],
-            **filters: Any,
+        self,
+        update_data: dict[str, Any],
+        **filters: Any,
     ) -> dict[str, Any] | None:
         pass
 
     @abstractmethod
-    async def delete_object(
-            self,
-            **filters: Any
-    ) -> None:
+    async def delete_object(self, **filters: Any) -> None:
         pass
 
 

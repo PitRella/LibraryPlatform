@@ -1,6 +1,6 @@
 from typing import Any
-from sqlalchemy import text
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.base.repositories import BaseRepository
@@ -22,7 +22,7 @@ class AuthRepository(BaseRepository):
             return result.scalar_one()
 
     async def get_object(self, **filters: Any) -> dict[str, Any] | None:
-        conditions = " AND ".join(f"{key} = :{key}" for key in filters.keys())
+        conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
 
         sql = text(f"""
                     SELECT id, author_id, refresh_token, expires_in, created_at
@@ -37,14 +37,14 @@ class AuthRepository(BaseRepository):
             return dict(row) if row else None
 
     async def update_object(
-            self,
-            update_data: dict[str, Any],
-            **filters: Any,
+        self,
+        update_data: dict[str, Any],
+        **filters: Any,
     ) -> dict[str, Any] | None:
-        set_expr = ", ".join(f"{k} = :set_{k}" for k in update_data.keys())
-        conditions = " AND ".join(f"{k} = :{k}" for k in filters.keys())
+        set_expr = ', '.join(f'{k} = :set_{k}' for k in update_data)
+        conditions = ' AND '.join(f'{k} = :{k}' for k in filters)
 
-        params = {**{f"set_{k}": v for k, v in update_data.items()}, **filters}
+        params = {**{f'set_{k}': v for k, v in update_data.items()}, **filters}
 
         sql = text(f"""
             UPDATE refresh_tokens
@@ -58,7 +58,7 @@ class AuthRepository(BaseRepository):
             return dict(row) if row else None
 
     async def delete_object(self, **filters: Any) -> None:
-        conditions = " AND ".join(f"{k} = :{k}" for k in filters.keys())
+        conditions = ' AND '.join(f'{k} = :{k}' for k in filters)
 
         sql = text(f"""
             DELETE FROM refresh_tokens

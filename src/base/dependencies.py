@@ -9,10 +9,10 @@ from src.database import get_db
 
 Service = TypeVar('Service', bound=BaseService)
 
+
 def get_service[Service](
     service_type: type[Service],
 ) -> Callable[[AsyncSession], Service]:
-
     def _get_service(db: Annotated[AsyncSession, Depends(get_db)]) -> Service:
         return service_type(db_session=db)  # type: ignore
 

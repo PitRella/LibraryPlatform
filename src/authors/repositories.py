@@ -25,7 +25,7 @@ class AuthorRepository(BaseRepository):
             return result.scalar_one()
 
     async def get_object(self, **filters: Any) -> dict[str, Any] | None:
-        conditions = " AND ".join(f"{key} = :{key}" for key in filters.keys())
+        conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
 
         sql = text(f"""
             SELECT id, email, name, biography, birth_year, nationality, created_at, password
@@ -39,15 +39,12 @@ class AuthorRepository(BaseRepository):
             row = result.mappings().first()
             return dict(row) if row else None
 
-    async def delete_object(
-            self,
-            **filters: Any
-    ) -> None:
+    async def delete_object(self, **filters: Any) -> None:
         raise NotImplementedError
 
     async def update_object(
-            self,
-            update_data: dict[str, Any],
-            **filters: Any,
+        self,
+        update_data: dict[str, Any],
+        **filters: Any,
     ) -> dict[str, Any] | None:
         raise NotImplementedError

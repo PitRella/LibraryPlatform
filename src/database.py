@@ -28,7 +28,7 @@ class Base(DeclarativeBase):
 
 engine = create_async_engine(
     settings.database_settings.database_url,
-    echo=(settings.APP_MODE == 'dev'), # Echo only in dev mode
+    echo=(settings.APP_MODE == 'dev'),  # Echo only in dev mode
 )
 
 async_db_session = async_sessionmaker(

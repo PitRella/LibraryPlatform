@@ -3,7 +3,6 @@ from fastapi import HTTPException
 
 class AuthorizationException(HTTPException):
     """Base exception for auth-related errors."""
-    pass
 
 
 class WrongCredentialsException(AuthorizationException):
@@ -18,18 +17,16 @@ class WrongCredentialsException(AuthorizationException):
 
 
 class AccessTokenExpiredException(HTTPException):
-
     def __init__(self) -> None:
         super().__init__(status_code=404, detail='Access token expired')
 
 
 class RefreshTokenException(HTTPException):
-
     def __init__(self) -> None:
         super().__init__(
             status_code=404,
             detail='Cannot process refresh '
-                   'token. Probably token '
-                   "expired, doesn't exist or"
-                   ' attached to deleted user.',
+            'token. Probably token '
+            "expired, doesn't exist or"
+            ' attached to deleted user.',
         )

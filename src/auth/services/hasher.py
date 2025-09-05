@@ -9,7 +9,6 @@ class Hasher:
 
     @classmethod
     def hash_password(cls: type['Hasher'], unhashed_password: str) -> str:
-
         return cls._crypt_context.hash(unhashed_password)
 
     @classmethod

@@ -16,7 +16,9 @@ oauth_scheme: OAuth2PasswordBearer = OAuth2PasswordBearer(
 async def get_author_from_token(
     token: Annotated[str, Security(oauth_scheme)],
     auth_service: Annotated[AuthService, Depends(get_service(AuthService))],
-    author_service: Annotated[AuthorService, Depends(get_service(AuthorService))],
+    author_service: Annotated[
+        AuthorService, Depends(get_service(AuthorService))
+    ],
 ) -> dict[str, Any]:
     author_id = await auth_service.validate_token_for_user(token)
     return await author_service.get_author_by_id(author_id)

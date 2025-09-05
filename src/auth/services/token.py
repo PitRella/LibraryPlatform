@@ -18,7 +18,6 @@ type access_token = dict[str, str | datetime]
 
 
 class TokenManager:
-
     @classmethod
     def generate_access_token(cls, author_id: int) -> str:
         to_encode: access_token = {
@@ -37,7 +36,6 @@ class TokenManager:
 
     @classmethod
     def generate_refresh_token(cls) -> tuple[uuid.UUID, timedelta]:
-
         return uuid.uuid4(), timedelta(
             days=settings.token_settings.REFRESH_TOKEN_EXPIRE_DAYS
         )
@@ -70,9 +68,8 @@ class TokenManager:
         refresh_token_model: dict[str, Any],
     ) -> None:
         current_date: datetime = datetime.now(UTC)
-        refresh_token_expire_date: datetime = (
-            refresh_token_model['created_at']
-            + timedelta(seconds=refresh_token_model['expires_in'])
-        )
+        refresh_token_expire_date: datetime = refresh_token_model[
+            'created_at'
+        ] + timedelta(seconds=refresh_token_model['expires_in'])
         if current_date >= refresh_token_expire_date:
             raise RefreshTokenException
