@@ -68,6 +68,9 @@ class CreateAuthorRequestSchema(BaseSchema):
             raise BadPasswordSchemaException()
         return value
 
+class CreateAuthorResponseSchema(BaseSchema):
+    id: int
+
 class GetAuthorResponseSchema(BaseModel):
     email: EmailStr
     name: str
