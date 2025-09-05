@@ -76,4 +76,36 @@ class BookRepository(ListableRepository):
             limit: int = 10,
             cursor: int | None = None
     ) -> list[dict[str, Any]] | None:
-        raise NotImplementedError
+        if cursor:
+            sql = text("""
+                       SELECT id,
+                              title,
+                              genre,
+                              language,
+                              published_year,
+                              author_id,
+                              created_at
+                       FROM books
+                       WHERE id > :cursor
+                       ORDER BY id
+                       LIMIT :limit
+                       """)
+            params = {"cursor": cursor, "limit": limit}
+        else:
+            sql = text("""
+                       SELECT id,
+                              title,
+                              genre,
+                              language,
+                              published_year,
+                              author_id,
+                              created_at
+                       FROM books
+                       ORDER BY id
+                       LIMIT :limit
+                       """)
+            params = {"limit": limit}
+
+        result = await self._session.execute(sql, params)
+        rows = result.mappings().all()
+        return [dict(r) for r in rows]

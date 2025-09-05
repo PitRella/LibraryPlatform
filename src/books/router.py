@@ -9,13 +9,15 @@ from src.books.service import BooksService
 
 books_router = APIRouter(prefix='/books', tags=['books'])
 
+
 @books_router.get('/all')
 async def get_all_books(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
         limit: int = Query(10, gt=0, le=100),
         cursor: int | None = Query(None),
-):
+) -> list[GetBookResponseSchema] | None:
     books = await service.get_all_books(limit, cursor)
+    return [GetBookResponseSchema.model_validate(b) for b in books]
 
 
 @books_router.post('/',
