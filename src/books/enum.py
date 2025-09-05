@@ -1,14 +1,14 @@
 from enum import StrEnum
 
 class BookGenre(StrEnum):
-    FICTION = 'Fiction'
-    NON_FICTION = 'Non-Fiction'
-    SCIENCE = 'Science'
-    HISTORY = 'History'
-    FANTASY = 'Fantasy'
-    COMEDY = 'Comedy'
-    DRAMA = 'Drama'
+    FICTION = 'FICTION'
+    NON_FICTION = 'NON_FICTION'
+    SCIENCE = 'SCIENCE'
+    HISTORY = 'HISTORY'
+    FANTASY = 'FANTASY'
+    COMEDY = 'COMEDY'
+    DRAMA = 'DRAMA'
 
 class BookLanguage(StrEnum):
-    ENGLISH = 'English'
-    UKRAINIAN = 'Ukrainian'
+    ENGLISH = 'ENGLISH'
+    UKRAINIAN = 'UKRAINIAN'

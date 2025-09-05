@@ -27,8 +27,7 @@ class CreateBookRequestSchema(BaseSchema):
     genre: BookGenre
     language: BookLanguage
 
-    published_year: Annotated[int | None, Field(
-        default=None,
+    published_year: Annotated[int, Field(
         ge=1800,
         le=dt.now().year,
         example=1985,
