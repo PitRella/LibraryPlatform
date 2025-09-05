@@ -15,9 +15,7 @@ class AuthorService(BaseService):
     def __init__(self, db_session: AsyncSession) -> None:
         super().__init__(db_session, repo=AuthorRepository(db_session))
 
-    async def get_author_by_id(
-        self, user_id: int | str
-    ) -> dict[str, Any] | None:
+    async def get_author_by_id(self, user_id: int | str) -> dict[str, Any]:
         author_data = await self._repo.get_object(id=int(user_id))
         if not author_data:
             raise AuthorNotFoundByIdException

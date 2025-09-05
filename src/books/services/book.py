@@ -122,7 +122,7 @@ class BooksService(BaseService):
         if year_to is not None:
             filters.append('published_year <= :year_to')
             params_d.year_to = year_to
-        rows = await self._repo.list_objects(filters, params_d.to_dict())
+        rows = await self._repo.list_objects(filters, params_d.to_dict())  # type: ignore
         items = rows[:limit]
         next_cursor = items[-1]['id'] if len(rows) > limit else None
         return GetBooksResponseDTO(items=items, next_cursor=next_cursor)

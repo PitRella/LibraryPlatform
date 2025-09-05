@@ -5,22 +5,24 @@ from datetime import UTC, datetime
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.types import ASGIApp
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 logger = logging.getLogger(__name__)
 
 
 class GlobalExceptionMiddleware:
     def __init__(self, app: ASGIApp) -> None:
-        self.app = app
+        self.app: ASGIApp = app
 
-    async def __call__(self, scope, receive, send) -> None:
+    async def __call__(
+        self, scope: Scope, receive: Receive, send: Send
+    ) -> None:
         if scope['type'] != 'http':
             await self.app(scope, receive, send)
             return
 
-        request = Request(scope, receive=receive)
-        request_id = str(uuid.uuid4())
+        request: Request = Request(scope, receive=receive)
+        request_id: str = str(uuid.uuid4())
         scope.setdefault('state', {})
         scope['state']['request_id'] = request_id
 
@@ -32,8 +34,8 @@ class GlobalExceptionMiddleware:
                 raise
 
             logger.exception('Unhandled exception (request_id=%s)', request_id)
-            now = datetime.now(UTC).isoformat()
-            response = JSONResponse(
+            now: str = datetime.now(UTC).isoformat()
+            response: JSONResponse = JSONResponse(
                 status_code=500,
                 content={
                     'code': 'INTERNAL_SERVER_ERROR',

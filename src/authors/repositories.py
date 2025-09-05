@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +22,7 @@ class AuthorRepository(BaseRepository):
         )
         async with self._session.begin():
             result = await self._session.execute(sql, params)
-            return result.scalar_one()
+            return cast(int, result.scalar_one())
 
     async def get_object(self, **filters: Any) -> dict[str, Any] | None:
         conditions = ' AND '.join(f'{key} = :{key}' for key in filters)

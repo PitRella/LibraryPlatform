@@ -1,7 +1,7 @@
 """init_tables
 
 Revision ID: 016df85c3b60
-Revises: 
+Revises:
 Create Date: 2025-09-04 23:51:59.517960
 
 """
