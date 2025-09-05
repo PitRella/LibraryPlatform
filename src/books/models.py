@@ -11,8 +11,7 @@ from src.books.enum import BookGenre, BookLanguage
 
 
 class Book(PrimaryKeyMixin, TimeStampMixin):
-    """
-    SQLAlchemy model for a book entity.
+    """SQLAlchemy model for a book entity.
 
     Inherits primary key and timestamp mixins for ID and timestamps.
 
@@ -23,6 +22,7 @@ class Book(PrimaryKeyMixin, TimeStampMixin):
         published_year (int): Year the book was published.
         author_id (int): Foreign key referencing the author.
         author (Author): Relationship to the Author model.
+
     """
 
     __tablename__ = 'books'
@@ -43,10 +43,10 @@ class Book(PrimaryKeyMixin, TimeStampMixin):
     author: Mapped['Author'] = relationship('Author', back_populates='books')
 
     def __repr__(self) -> str:
-        """
-        Return a string representation of the book instance.
+        """Return a string representation of the book instance.
 
         Returns:
             str: Formatted string showing id, title, and author_id.
+
         """
         return f'<Book(id={self.id}, title="{self.title}", author_id={self.author_id})>'

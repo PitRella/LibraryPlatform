@@ -25,50 +25,41 @@ books_router = APIRouter(prefix='/books', tags=['books'])
     description='Retrieve all books with optional filters and pagination.',
 )
 async def get_all_books(
-        service: Annotated[BooksService, Depends(get_service(BooksService))],
-        limit: int = Query(
-            10,
-            gt=0,
-            le=100,
-            description='Maximum number of books'
-        ),
-        cursor: int | None = Query(
-            None,
-            description='Cursor for pagination'
-        ),
-        title: str | None = Query(
-            None,
-            min_length=1,
-            max_length=50,
-            pattern=r'^[a-zA-Z\s\-\'\.]+$',
-            description='Filter by book title',
-            examples=['Romeo and Juliet', 'The Shining'],
-        ),
-        genre: BookGenre | None = None,
-        language: BookLanguage | None = None,
-        published_year: int | None = Query(
-            None,
-            ge=1800,
-            le=dt.now().year,
-            description='Filter by published year',
-            examples=[1985, 2022],
-        ),
-        year_from: int | None = Query(
-            None,
-            ge=1800,
-            le=dt.now().year,
-            description='Filter books published from this year (inclusive)',
-        ),
-        year_to: int | None = Query(
-            None,
-            ge=1800,
-            le=dt.now().year,
-            description='Filter books published up to this year (inclusive)',
-        ),
-        author_id: int | None = Query(None, ge=0),
+    service: Annotated[BooksService, Depends(get_service(BooksService))],
+    limit: int = Query(10, gt=0, le=100, description='Maximum number of books'),
+    cursor: int | None = Query(None, description='Cursor for pagination'),
+    title: str | None = Query(
+        None,
+        min_length=1,
+        max_length=50,
+        pattern=r'^[a-zA-Z\s\-\'\.]+$',
+        description='Filter by book title',
+        examples=['Romeo and Juliet', 'The Shining'],
+    ),
+    genre: BookGenre | None = None,
+    language: BookLanguage | None = None,
+    published_year: int | None = Query(
+        None,
+        ge=1800,
+        le=dt.now().year,
+        description='Filter by published year',
+        examples=[1985, 2022],
+    ),
+    year_from: int | None = Query(
+        None,
+        ge=1800,
+        le=dt.now().year,
+        description='Filter books published from this year (inclusive)',
+    ),
+    year_to: int | None = Query(
+        None,
+        ge=1800,
+        le=dt.now().year,
+        description='Filter books published up to this year (inclusive)',
+    ),
+    author_id: int | None = Query(None, ge=0),
 ) -> GetBooksListResponseSchema:
-    """
-    Retrieve all books matching given filters with pagination.
+    """Retrieve all books matching given filters with pagination.
 
     Args:
         service (BooksService): Service dependency for book operations.
@@ -84,6 +75,7 @@ async def get_all_books(
 
     Returns:
         GetBooksListResponseSchema: List of books and next cursor.
+
     """
     books_result = await service.get_all_books(
         limit=limit,
@@ -110,12 +102,11 @@ async def get_all_books(
     description='Create a new book by the authenticated author.',
 )
 async def create_book(
-        author: Annotated[dict[str, Any], Depends(get_author_from_token)],
-        book_schema: CreateBookRequestSchema,
-        service: Annotated[BooksService, Depends(get_service(BooksService))],
+    author: Annotated[dict[str, Any], Depends(get_author_from_token)],
+    book_schema: CreateBookRequestSchema,
+    service: Annotated[BooksService, Depends(get_service(BooksService))],
 ) -> CreateBookResponseSchema:
-    """
-    Create a new book in the system.
+    """Create a new book in the system.
 
     Args:
         author (dict[str, Any]): Authenticated author creating the book.
@@ -124,6 +115,7 @@ async def create_book(
 
     Returns:
         CreateBookResponseSchema: ID of the created book.
+
     """
     book_id: int = await service.create_book(author, book_schema)
     return CreateBookResponseSchema(id=book_id)
@@ -135,16 +127,15 @@ async def create_book(
     description='Retrieve details of a book by its ID.',
 )
 async def get_book(
-        service: Annotated[BooksService, Depends(get_service(BooksService))],
-        book_id: int = Path(
-            ...,
-            ge=1,
-            description='Book ID',
-            examples=[1, 2, 3],
-        ),
+    service: Annotated[BooksService, Depends(get_service(BooksService))],
+    book_id: int = Path(
+        ...,
+        ge=1,
+        description='Book ID',
+        examples=[1, 2, 3],
+    ),
 ) -> GetBookResponseSchema:
-    """
-    Retrieve a single book by ID.
+    """Retrieve a single book by ID.
 
     Args:
         service (BooksService): Service dependency for book operations.
@@ -152,6 +143,7 @@ async def get_book(
 
     Returns:
         GetBookResponseSchema: Book details.
+
     """
     book_data = await service.get_book(book_id)
     return GetBookResponseSchema.model_validate(book_data)
@@ -163,18 +155,17 @@ async def get_book(
     description='Update details of a book by its author.',
 )
 async def update_book(
-        author: Annotated[dict[str, Any], Depends(get_author_from_token)],
-        update_book_schema: UpdateBookRequestSchema,
-        service: Annotated[BooksService, Depends(get_service(BooksService))],
-        book_id: int = Path(
-            ...,
-            ge=1,
-            description='Book ID',
-            examples=[1, 2, 3],
-        ),
+    author: Annotated[dict[str, Any], Depends(get_author_from_token)],
+    update_book_schema: UpdateBookRequestSchema,
+    service: Annotated[BooksService, Depends(get_service(BooksService))],
+    book_id: int = Path(
+        ...,
+        ge=1,
+        description='Book ID',
+        examples=[1, 2, 3],
+    ),
 ) -> GetBookResponseSchema:
-    """
-    Update book fields by author.
+    """Update book fields by author.
 
     Args:
         author (dict[str, Any]): Authenticated author performing update.
@@ -184,6 +175,7 @@ async def update_book(
 
     Returns:
         GetBookResponseSchema: Updated book details.
+
     """
     updated_book = await service.update_book(
         author=author, book_id=book_id, update_book_schema=update_book_schema
@@ -198,17 +190,17 @@ async def update_book(
     status_code=204,
 )
 async def delete_book(
-        author: Annotated[dict[str, Any], Depends(get_author_from_token)],
-        service: Annotated[BooksService, Depends(get_service(BooksService))],
-        book_id: int = Path(..., ge=1, description='Book ID'),
+    author: Annotated[dict[str, Any], Depends(get_author_from_token)],
+    service: Annotated[BooksService, Depends(get_service(BooksService))],
+    book_id: int = Path(..., ge=1, description='Book ID'),
 ) -> None:
-    """
-    Delete a book if author has permission.
+    """Delete a book if author has permission.
 
     Args:
         author (dict[str, Any]): Authenticated author performing deletion.
         service (BooksService): Service dependency for book operations.
         book_id (int): ID of the book to delete.
+
     """
     await service.delete_book(
         author=author,
@@ -223,12 +215,11 @@ async def delete_book(
     status_code=201,
 )
 async def import_books(
-        author: Annotated[dict[str, Any], Depends(get_author_from_token)],
-        service: Annotated[BooksService, Depends(get_service(BooksService))],
-        file: UploadFile = File(..., description='Books file (JSON or CSV)'),
+    author: Annotated[dict[str, Any], Depends(get_author_from_token)],
+    service: Annotated[BooksService, Depends(get_service(BooksService))],
+    file: UploadFile = File(..., description='Books file (JSON or CSV)'),
 ) -> UploadedBooksResponseSchema:
-    """
-    Import multiple books from a file.
+    """Import multiple books from a file.
 
     Args:
         author (dict[str, Any]): Authenticated author performing import.
@@ -237,6 +228,7 @@ async def import_books(
 
     Returns:
         UploadedBooksResponseSchema: Number of books imported and their IDs.
+
     """
     books_info = await service.import_books(author, file)
     return UploadedBooksResponseSchema.model_validate(books_info.to_dict())

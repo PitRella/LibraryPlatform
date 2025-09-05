@@ -19,8 +19,7 @@ from src.books.services.importers import BookImporterFactory
 
 
 class BooksService(BaseService):
-    """
-    Service layer for managing books.
+    """Service layer for managing books.
 
     Provides methods to create, retrieve, update, delete, list, and import
     books. Ensures proper author permissions and formats book data before
@@ -29,6 +28,7 @@ class BooksService(BaseService):
     Attributes:
         db_session (AsyncSession): Async database session for operations.
         _repo (BookRepository): Repository instance for book data access.
+
     """
 
     def __init__(
@@ -36,12 +36,12 @@ class BooksService(BaseService):
         db_session: AsyncSession,
         repo: BookRepository | None = None,
     ) -> None:
-        """
-        Initialize BooksService with a database session and optional repo.
+        """Initialize BooksService with a database session and optional repo.
 
         Args:
             db_session (AsyncSession): The async session to interact with DB.
             repo (BookRepository | None): Optional custom book repository.
+
         """
         super().__init__(db_session, repo or BookRepository(db_session))
 
@@ -49,8 +49,7 @@ class BooksService(BaseService):
     def _validate_author_permission(
         book: dict[str, Any] | None, author: dict[str, Any]
     ) -> None:
-        """
-        Raise exception if the author does not own the book.
+        """Raise exception if the author does not own the book.
 
         Args:
             book (dict[str, Any] | None): Book data to validate.
@@ -58,6 +57,7 @@ class BooksService(BaseService):
 
         Raises:
             BookPermissionException: If author does not have permission.
+
         """
         if not book or author['id'] != book['author_id']:
             raise BookPermissionException
@@ -66,8 +66,7 @@ class BooksService(BaseService):
     def _format_book_data(
         author: dict[str, Any], book_schema: CreateBookRequestSchema
     ) -> dict[str, Any]:
-        """
-        Prepare book data for creation or import.
+        """Prepare book data for creation or import.
 
         Adds author ID and creation timestamp to the schema data.
 
@@ -77,6 +76,7 @@ class BooksService(BaseService):
 
         Returns:
             dict[str, Any]: Formatted book data.
+
         """
         book_data = book_schema.model_dump()
         book_data['author_id'] = author['id']
@@ -88,8 +88,7 @@ class BooksService(BaseService):
         author: dict[str, Any],
         book_schema: CreateBookRequestSchema,
     ) -> int:
-        """
-        Create a new book record in the database.
+        """Create a new book record in the database.
 
         Args:
             author (dict[str, Any]): Author creating the book.
@@ -97,14 +96,14 @@ class BooksService(BaseService):
 
         Returns:
             int: ID of the newly created book.
+
         """
         book_data = self._format_book_data(author, book_schema)
         book_id: int = await self._repo.create_object(book_data)
         return book_id
 
     async def get_book(self, book_id: int) -> dict[str, Any]:
-        """
-        Retrieve a book by its ID.
+        """Retrieve a book by its ID.
 
         Args:
             book_id (int): Unique identifier of the book.
@@ -114,6 +113,7 @@ class BooksService(BaseService):
 
         Raises:
             BookNotFoundException: If the book does not exist.
+
         """
         book = await self._repo.get_object(id=book_id)
         if not book:
@@ -126,8 +126,7 @@ class BooksService(BaseService):
         book_id: int,
         update_book_schema: UpdateBookRequestSchema,
     ) -> dict[str, Any]:
-        """
-        Update an existing book's data.
+        """Update an existing book's data.
 
         Args:
             author (dict[str, Any]): Author performing the update.
@@ -140,6 +139,7 @@ class BooksService(BaseService):
         Raises:
             BookPermissionException: If author is not allowed to update.
             BookNotFoundException: If book does not exist.
+
         """
         book = await self._repo.get_object(id=book_id)
         self._validate_author_permission(book, author)
@@ -158,8 +158,7 @@ class BooksService(BaseService):
         author: dict[str, Any],
         book_id: int,
     ) -> None:
-        """
-        Delete a book by ID if author has permission.
+        """Delete a book by ID if author has permission.
 
         Args:
             author (dict[str, Any]): Author requesting deletion.
@@ -168,6 +167,7 @@ class BooksService(BaseService):
         Raises:
             BookPermissionException: If author cannot delete the book.
             BookNotFoundException: If book does not exist.
+
         """
         book = await self._repo.get_object(id=book_id)
         self._validate_author_permission(book, author)
@@ -185,8 +185,7 @@ class BooksService(BaseService):
         year_from: int | None = None,
         year_to: int | None = None,
     ) -> GetBooksResponseDTO:
-        """
-        List books with optional filters and pagination.
+        """List books with optional filters and pagination.
 
         Supports filtering by title, genre, language, author, and year.
 
@@ -203,6 +202,7 @@ class BooksService(BaseService):
 
         Returns:
             GetBooksResponseDTO: Paginated books and next cursor.
+
         """
         filters: list[str] = []
         params_d = GetBooksParamsResponseDTO(limit=limit + 1)
@@ -238,8 +238,7 @@ class BooksService(BaseService):
     async def import_books(
         self, author: dict[str, Any], file: UploadFile
     ) -> ImportedBooksDTO:
-        """
-        Bulk import books from a CSV or JSON file.
+        """Bulk import books from a CSV or JSON file.
 
         Args:
             author (dict[str, Any]): Author importing the books.
@@ -247,6 +246,7 @@ class BooksService(BaseService):
 
         Returns:
             ImportedBooksDTO: Number of books imported and their IDs.
+
         """
         importer = BookImporterFactory.get_importer(file)
         books_to_create = await importer.parse(file)

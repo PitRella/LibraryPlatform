@@ -7,21 +7,21 @@ from src.books.enum import BookGenre, BookLanguage
 
 @dataclass
 class ImportedBooksDTO(BaseDTO):
-    """
-    DTO representing the result of a bulk book import.
+    """DTO representing the result of a bulk book import.
 
     Attributes:
         imported (int): Number of books successfully imported.
         book_ids (list[int]): IDs of the imported books.
+
     """
+
     imported: int
     book_ids: list[int]
 
 
 @dataclass
 class GetBooksParamsResponseDTO(BaseDTO):
-    """
-    DTO for filtering and pagination parameters when retrieving books.
+    """DTO for filtering and pagination parameters when retrieving books.
 
     Attributes:
         limit (int | None): Maximum number of books to return.
@@ -33,7 +33,9 @@ class GetBooksParamsResponseDTO(BaseDTO):
         published_year (int | None): Filter by exact published year.
         year_from (int | None): Filter books published from this year (inclusive).
         year_to (int | None): Filter books published up to this year (inclusive).
+
     """
+
     limit: int | None = None
     cursor: int | None = None
     title: str | None = None
@@ -47,12 +49,13 @@ class GetBooksParamsResponseDTO(BaseDTO):
 
 @dataclass
 class GetBooksResponseDTO(BaseDTO):
-    """
-    DTO for the response when retrieving multiple books.
+    """DTO for the response when retrieving multiple books.
 
     Attributes:
         items (list[dict[str, Any]]): List of books as dictionaries.
         next_cursor (int | None): Cursor for the next page of results, if any.
+
     """
+
     items: list[dict[str, Any]]
     next_cursor: int | None

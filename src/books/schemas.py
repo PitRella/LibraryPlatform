@@ -8,8 +8,7 @@ from src.books.enum import BookGenre, BookLanguage
 
 
 class CreateBookRequestSchema(BaseSchema):
-    """
-    Schema for creating a new book.
+    """Schema for creating a new book.
 
     Attributes:
         title (str): Title of the book. 2-50 chars, letters, spaces, hyphens,
@@ -17,7 +16,9 @@ class CreateBookRequestSchema(BaseSchema):
         genre (BookGenre): Genre of the book.
         language (BookLanguage): Language of the book.
         published_year (int): Year of publication (1800-current year).
+
     """
+
     title: Annotated[
         str,
         Field(
@@ -43,18 +44,18 @@ class CreateBookRequestSchema(BaseSchema):
 
 
 class CreateBookResponseSchema(BaseSchema):
-    """
-    Schema for response after creating a book.
+    """Schema for response after creating a book.
 
     Attributes:
         id (int): ID of the newly created book.
+
     """
+
     id: int
 
 
 class UpdateBookRequestSchema(BaseSchema):
-    """
-    Schema for updating an existing book.
+    """Schema for updating an existing book.
 
     All fields are optional and validate constraints as in creation.
 
@@ -64,7 +65,9 @@ class UpdateBookRequestSchema(BaseSchema):
         genre (BookGenre | None): Updated genre.
         language (BookLanguage | None): Updated language.
         published_year (int | None): Updated publication year (1800-current).
+
     """
+
     title: Annotated[
         str | None,
         Field(
@@ -91,8 +94,7 @@ class UpdateBookRequestSchema(BaseSchema):
 
 
 class GetBookResponseSchema(BaseSchema):
-    """
-    Schema for retrieving book details.
+    """Schema for retrieving book details.
 
     Attributes:
         id (int): Book ID.
@@ -100,7 +102,9 @@ class GetBookResponseSchema(BaseSchema):
         genre (BookGenre): Book genre.
         language (BookLanguage): Book language.
         published_year (int): Year the book was published.
+
     """
+
     id: int
     title: str
     genre: BookGenre
@@ -109,24 +113,26 @@ class GetBookResponseSchema(BaseSchema):
 
 
 class UploadedBooksResponseSchema(BaseSchema):
-    """
-    Schema for response after bulk book import.
+    """Schema for response after bulk book import.
 
     Attributes:
         imported (int): Number of books successfully imported.
         book_ids (list[int]): IDs of imported books.
+
     """
+
     imported: int
     book_ids: list[int]
 
 
 class GetBooksListResponseSchema(BaseSchema):
-    """
-    Schema for paginated list of books.
+    """Schema for paginated list of books.
 
     Attributes:
         items (list[GetBookResponseSchema]): List of books.
         next_cursor (int | None): Cursor for next page, if any.
+
     """
+
     items: list[GetBookResponseSchema]
     next_cursor: int | None
