@@ -38,3 +38,16 @@ class AuthorRepository(BaseRepository):
             result = await self._session.execute(sql, filters)
             row = result.mappings().first()
             return dict(row) if row else None
+
+    async def delete_object(
+            self,
+            **filters: Any
+    ) -> None:
+        raise NotImplementedError
+
+    async def update_object(
+            self,
+            update_data: dict[str, Any],
+            **filters: Any,
+    ) -> dict[str, Any] | None:
+        raise NotImplementedError
