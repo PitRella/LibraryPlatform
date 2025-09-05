@@ -21,5 +21,18 @@ class AuthRepository(BaseRepository):
             result = await self._session.execute(sql, params)
             return result.scalar_one()
 
-    async def get_object(self, params: dict[str, Any]) -> Any:
-        pass
+
+    async def get_object(self, **filters: Any) -> dict[str, Any] | None:
+        conditions = " AND ".join(f"{key} = :{key}" for key in filters.keys())
+
+        sql = text(f"""
+                    SELECT id, author_id, refresh_token, expires_in, created_at
+                    FROM refresh_tokens
+                    WHERE {conditions}
+                    LIMIT 1
+                """)
+
+        async with self._session.begin():
+            result = await self._session.execute(sql, filters)
+            row = result.mappings().first()
+            return dict(row) if row else None
