@@ -156,8 +156,8 @@ class BookFiltersSchema(BaseSchema):
         genre (BookGenre | None): Filter by exact genre match.
         language (BookLanguage | None): Filter by exact language match.
         published_year (int | None): Filter by exact publication year.
-        year_from (int | None): Filter books published from this year (inclusive).
-        year_to (int | None): Filter books published up to this year (inclusive).
+        year_from (int | None): Filter published from this year (inclusive).
+        year_to (int | None): Filter published up to this year (inclusive).
         author_id (int | None): Filter by specific author ID.
 
     Example:

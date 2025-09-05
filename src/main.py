@@ -17,9 +17,12 @@ configure_logging()
 app = FastAPI(
     title='Library Platform API',
     description=(
-        'A comprehensive REST API for managing books and authors in a library system. '
-        'This API provides endpoints for author registration, authentication, book management, '
-        'and bulk import functionality. Built with FastAPI, SQLAlchemy, and PostgreSQL.'
+        'A comprehensive REST API for managing books and '
+        'uthors in a library system. '
+        'This API provides endpoints for author registration,'
+        ' authentication, book management, '
+        'and bulk import functionality.'
+        ' Built with FastAPI, SQLAlchemy, and PostgreSQL.'
     ),
     version='1.0.0',
     contact={
