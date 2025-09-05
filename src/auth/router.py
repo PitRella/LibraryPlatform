@@ -5,6 +5,12 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from src.auth.dependencies import get_author_from_token
+from src.auth.responses import (
+    GET_ME_RESPONSES,
+    LOGIN_RESPONSES,
+    LOGOUT_RESPONSES,
+    REFRESH_TOKEN_RESPONSES,
+)
 from src.auth.schemas import RefreshTokenRequestSchema, TokenSchemas
 from src.auth.services.auth import AuthService
 from src.authors.schemas import GetAuthorResponseSchema
@@ -15,7 +21,13 @@ auth_router = APIRouter(prefix='/auth', tags=['auth'])
 settings = Settings.load()
 
 
-@auth_router.post(path='/login', response_model=TokenSchemas)
+@auth_router.post(
+    path='/login',
+    response_model=TokenSchemas,
+    summary='User login',
+    description='Authenticate user with email and password to get access and refresh tokens.',
+    responses=LOGIN_RESPONSES,
+)
 async def login_user(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     service: Annotated[AuthService, Depends(get_service(AuthService))],
@@ -38,7 +50,12 @@ async def login_user(
     return token
 
 
-@auth_router.get(path='/me')
+@auth_router.get(
+    path='/me',
+    summary='Get current user profile',
+    description="Retrieve the current authenticated author's profile information.",
+    responses=GET_ME_RESPONSES,
+)
 async def get_me(
     author: Annotated[dict[str, Any] | None, Depends(get_author_from_token)],
 ) -> GetAuthorResponseSchema:
@@ -54,7 +71,13 @@ async def get_me(
     return GetAuthorResponseSchema.model_validate(author)
 
 
-@auth_router.post(path='/refresh', response_model=TokenSchemas)
+@auth_router.post(
+    path='/refresh',
+    response_model=TokenSchemas,
+    summary='Refresh access token',
+    description='Get new access and refresh tokens using a valid refresh token.',
+    responses=REFRESH_TOKEN_RESPONSES,
+)
 async def refresh_token(
     refresh_request: Annotated[RefreshTokenRequestSchema, Depends()],
     service: Annotated[AuthService, Depends(get_service(AuthService))],
@@ -76,7 +99,13 @@ async def refresh_token(
     return token
 
 
-@auth_router.delete(path='/logout', status_code=204)
+@auth_router.delete(
+    path='/logout',
+    status_code=204,
+    summary='User logout',
+    description='Invalidate the provided refresh token to log out the user.',
+    responses=LOGOUT_RESPONSES,
+)
 async def logout_user(
     refresh_request: Annotated[RefreshTokenRequestSchema, Depends()],
     service: Annotated[AuthService, Depends(get_service(AuthService))],

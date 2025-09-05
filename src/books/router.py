@@ -4,6 +4,14 @@ from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
 
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
+from src.books.responses import (
+    CREATE_BOOK_RESPONSES,
+    DELETE_BOOK_RESPONSES,
+    GET_BOOK_RESPONSES,
+    GET_BOOKS_RESPONSES,
+    IMPORT_BOOKS_RESPONSES,
+    UPDATE_BOOK_RESPONSES,
+)
 from src.books.schemas import (
     BookFiltersSchema,
     BookListParamsSchema,
@@ -23,6 +31,7 @@ books_router = APIRouter(prefix='/books', tags=['books'])
     '/all',
     summary='Get all books',
     description='Retrieve all books with optional filters and pagination.',
+    responses=GET_BOOKS_RESPONSES,
 )
 async def get_all_books(
     service: Annotated[BooksService, Depends(get_service(BooksService))],
@@ -60,6 +69,8 @@ async def get_all_books(
     '/',
     summary='Create a new book',
     description='Create a new book by the authenticated author.',
+    status_code=201,
+    responses=CREATE_BOOK_RESPONSES,
 )
 async def create_book(
     author: Annotated[dict[str, Any], Depends(get_author_from_token)],
@@ -85,6 +96,7 @@ async def create_book(
     '/{book_id}',
     summary='Get a book',
     description='Retrieve details of a book by its ID.',
+    responses=GET_BOOK_RESPONSES,
 )
 async def get_book(
     service: Annotated[BooksService, Depends(get_service(BooksService))],
@@ -113,6 +125,7 @@ async def get_book(
     '/{book_id}',
     summary='Update a book',
     description='Update details of a book by its author.',
+    responses=UPDATE_BOOK_RESPONSES,
 )
 async def update_book(
     author: Annotated[dict[str, Any], Depends(get_author_from_token)],
@@ -148,6 +161,7 @@ async def update_book(
     summary='Delete a book',
     description='Delete a book by its author.',
     status_code=204,
+    responses=DELETE_BOOK_RESPONSES,
 )
 async def delete_book(
     author: Annotated[dict[str, Any], Depends(get_author_from_token)],
@@ -173,6 +187,7 @@ async def delete_book(
     summary='Bulk import books',
     description='Upload a JSON or CSV file with books and import them.',
     status_code=201,
+    responses=IMPORT_BOOKS_RESPONSES,
 )
 async def import_books(
     author: Annotated[dict[str, Any], Depends(get_author_from_token)],

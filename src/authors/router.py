@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
+from src.authors.responses import CREATE_AUTHOR_RESPONSES
 from src.authors.schemas import (
     CreateAuthorRequestSchema,
     CreateAuthorResponseSchema,
@@ -14,7 +15,10 @@ author_router = APIRouter(prefix='/author', tags=['author'])
 
 @author_router.post(
     '/',
-    description='Create a new author.',
+    summary='Create a new author',
+    description='Create a new author account with email, password, and profile information.',
+    status_code=201,
+    responses=CREATE_AUTHOR_RESPONSES,
 )
 async def create_author(
     author_schema: CreateAuthorRequestSchema,
