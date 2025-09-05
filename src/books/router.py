@@ -9,9 +9,13 @@ from fastapi import Depends, Query, APIRouter, Path, UploadFile, File
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
 from src.books.enum import BookGenre, BookLanguage
-from src.books.schemas import CreateBookRequestSchema, GetBookResponseSchema, \
-    UpdateBookRequestSchema, CreateBookResponseSchema
-from src.books.service import BooksService
+from src.books.schemas import (
+    CreateBookRequestSchema,
+    GetBookResponseSchema,
+    UpdateBookRequestSchema,
+    CreateBookResponseSchema
+)
+from src.books.services import BooksService
 
 books_router = APIRouter(prefix='/books', tags=['books'])
 
