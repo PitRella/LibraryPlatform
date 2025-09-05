@@ -132,3 +132,41 @@ class ImportItemValidationException(ImportBadRequestException):
 
         """
         super().__init__(detail)
+
+
+class NoUpdateDataException(BookException):
+    """Raised when no update data is provided."""
+
+    def __init__(self) -> None:
+        """Initialize the exception with a predefined error message."""
+        super().__init__(
+            status_code=400,
+            detail='No update data provided',
+        )
+
+
+class NoFiltersException(BookException):
+    """Raised when no filters are provided for an operation."""
+
+    def __init__(self) -> None:
+        """Initialize the exception with a predefined error message."""
+        super().__init__(
+            status_code=400,
+            detail='No filters provided for operation',
+        )
+
+
+class UnsafeFilterException(BookException):
+    """Raised when an unsafe filter is detected."""
+
+    def __init__(self, filter_str: str) -> None:
+        """Initialize the exception with the unsafe filter string.
+
+        Args:
+            filter_str (str): The unsafe filter string that was detected.
+
+        """
+        super().__init__(
+            status_code=400,
+            detail=f'Unsafe filter detected: {filter_str}',
+        )

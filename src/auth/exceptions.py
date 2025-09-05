@@ -57,3 +57,25 @@ class RefreshTokenException(AuthorizationException):
                 'or attached to a deleted user.'
             ),
         )
+
+
+class NoUpdateDataException(AuthorizationException):
+    """Raised when no update data is provided."""
+
+    def __init__(self) -> None:
+        """Initialize the exception with a predefined error message."""
+        super().__init__(
+            status_code=400,
+            detail='No update data provided',
+        )
+
+
+class NoFiltersException(AuthorizationException):
+    """Raised when no filters are provided for an operation."""
+
+    def __init__(self) -> None:
+        """Initialize the exception with a predefined error message."""
+        super().__init__(
+            status_code=400,
+            detail='No filters provided for operation',
+        )

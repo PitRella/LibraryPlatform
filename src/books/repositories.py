@@ -3,7 +3,13 @@ from typing import Any, cast
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.base.query_builder import SecureQueryBuilder
 from src.base.repositories import ListableRepository
+from src.books.exceptions import (
+    NoFiltersException,
+    NoUpdateDataException,
+    UnsafeFilterException,
+)
 
 
 class BookRepository(ListableRepository):
@@ -60,17 +66,25 @@ class BookRepository(ListableRepository):
             dict[str, Any] | None: Book data if found, else None.
 
         """
-        conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
+        if not filters:
+            return None
 
-        sql = text(f"""
-            SELECT id,title,genre,language,published_year,author_id,created_at
-            FROM books
-            WHERE {conditions}
-            LIMIT 1
-        """)
+        # Build safe WHERE clause using SecureQueryBuilder
+        conditions = [(key, '=', key) for key in filters]
+        where_clause, safe_params = SecureQueryBuilder.build_where_clause(
+            'books', conditions, filters
+        )
+
+        sql = text(
+            'SELECT id, title, genre, language, published_year, '
+            'author_id, created_at '
+            'FROM books '
+            'WHERE ' + where_clause + ' '
+            'LIMIT 1'
+        )
 
         async with self._session.begin():
-            result = await self._session.execute(sql, filters)
+            result = await self._session.execute(sql, safe_params)
             row = result.mappings().first()
             return dict(row) if row else None
 
@@ -89,16 +103,33 @@ class BookRepository(ListableRepository):
             dict[str, Any] | None: Updated book data if found, else None.
 
         """
-        set_expr = ', '.join(f'{k} = :set_{k}' for k in update_data)
-        conditions = ' AND '.join(f'{k} = :{k}' for k in filters)
-        params = {**{f'set_{k}': v for k, v in update_data.items()}, **filters}
+        if not update_data:
+            raise NoUpdateDataException
+        if not filters:
+            raise NoFiltersException
 
-        sql = text(f"""
-            UPDATE books
-            SET {set_expr}
-            WHERE {conditions}
-            RETURNING *
-        """)
+        # Build safe SET clause
+        set_clause, set_params = SecureQueryBuilder.build_set_clause(
+            'books',
+            list(update_data.keys()),
+            {f'set_{k}': v for k, v in update_data.items()},
+        )
+
+        # Build safe WHERE clause
+        where_conditions = [(key, '=', key) for key in filters]
+        where_clause, where_params = SecureQueryBuilder.build_where_clause(
+            'books', where_conditions, filters
+        )
+
+        # Combine parameters
+        params = {**set_params, **where_params}
+
+        sql = text(
+            'UPDATE books '
+            'SET ' + set_clause + ' '
+            'WHERE ' + where_clause + ' '
+            'RETURNING *'
+        )
         async with self._session.begin():
             result = await self._session.execute(sql, params)
             row = result.mappings().first()
@@ -111,15 +142,20 @@ class BookRepository(ListableRepository):
             **filters (Any): Column-value filters to identify the book.
 
         """
-        conditions = ' AND '.join(f'{k} = :{k}' for k in filters)
+        if not filters:
+            raise NoFiltersException
 
-        sql = text(f"""
-            DELETE FROM books
-            WHERE {conditions}
-        """)
+        # Build safe WHERE clause
+        where_conditions = [(key, '=', key) for key in filters]
+        where_clause, safe_params = SecureQueryBuilder.build_where_clause(
+            'books', where_conditions, filters
+        )
+
+        # where_clause is validated by SecureQueryBuilder, so this is safe
+        sql = text('DELETE FROM books WHERE ' + where_clause)  # noqa: S608
 
         async with self._session.begin():
-            await self._session.execute(sql, filters)
+            await self._session.execute(sql, safe_params)
 
     async def list_objects(
         self,
@@ -136,21 +172,87 @@ class BookRepository(ListableRepository):
             list[dict[str, Any]]: List of books matching filters.
 
         """
-        where_clause = ' AND '.join(filters) if filters else 'TRUE'
-        sql = text(f"""
-            SELECT id,
-                   title,
-                   genre,
-                   language,
-                   published_year,
-                   author_id,
-                   created_at
-            FROM books
-            WHERE {where_clause}
-            ORDER BY id
-            LIMIT :limit
-        """)
+        # For list_objects, we need to validate that filters contain only safe
+        # conditions. This is a more complex case as we need to parse the filter
+        # strings. For now, we'll use a simple approach that validates against
+        # known patterns
+
+        if not filters:
+            where_clause = 'TRUE'
+        else:
+            validated_filters = []
+            for filter_str in filters:
+                if not self._is_safe_filter(filter_str):
+                    raise UnsafeFilterException(filter_str)
+                validated_filters.append(filter_str)
+            where_clause = ' AND '.join(validated_filters)
+
+        sql = text(
+            'SELECT id, title, genre, language, published_year, '
+            'author_id, created_at '
+            'FROM books '
+            'WHERE ' + where_clause + ' '
+            'ORDER BY id '
+            'LIMIT :limit'
+        )
 
         result = await self._session.execute(sql, params)
         rows = result.mappings().all()
         return [dict(r) for r in rows]
+
+    def _is_safe_filter(self, filter_str: str) -> bool:
+        """Check if a filter string is safe to use.
+
+        Args:
+            filter_str (str): Filter string to validate.
+
+        Returns:
+            bool: True if safe, False otherwise.
+
+        """
+        # Basic validation - check for common SQL injection patterns
+        dangerous_patterns = [
+            ';',
+            '--',
+            '/*',
+            '*/',
+            'xp_',
+            'sp_',
+            'exec',
+            'execute',
+            'union',
+            'select',
+            'insert',
+            'update',
+            'delete',
+            'drop',
+            'create',
+            'alter',
+            'grant',
+            'revoke',
+        ]
+
+        filter_lower = filter_str.lower()
+        for pattern in dangerous_patterns:
+            if pattern in filter_lower:
+                return False
+
+        # Check that it contains only allowed column names
+        allowed_columns = SecureQueryBuilder.ALLOWED_COLUMNS['books']
+        words = (
+            filter_str.replace('=', ' ')
+            .replace('!=', ' ')
+            .replace('<', ' ')
+            .replace('>', ' ')
+            .split()
+        )
+
+        for word in words:
+            if (
+                word.isalpha()
+                and word not in allowed_columns
+                and word.upper() not in ['AND', 'OR', 'NOT', 'IN', 'LIKE']
+            ):
+                return False
+
+        return True

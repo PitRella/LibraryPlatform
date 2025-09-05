@@ -3,6 +3,8 @@ from typing import Any, cast
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.exceptions import NoFiltersException, NoUpdateDataException
+from src.base.query_builder import SecureQueryBuilder
 from src.base.repositories import BaseRepository
 
 
@@ -50,17 +52,23 @@ class AuthRepository(BaseRepository):
                 otherwise None.
 
         """
-        conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
+        if not filters:
+            return None
 
-        sql = text(f"""
-                    SELECT id, author_id, refresh_token, expires_in, created_at
-                    FROM refresh_tokens
-                    WHERE {conditions}
-                    LIMIT 1
-                """)
+        conditions = [(key, '=', key) for key in filters]
+        where_clause, safe_params = SecureQueryBuilder.build_where_clause(
+            'refresh_tokens', conditions, filters
+        )
+
+        sql = text(
+            'SELECT id, author_id, refresh_token, expires_in, created_at '
+            'FROM refresh_tokens '
+            'WHERE ' + where_clause + ' '
+            'LIMIT 1'
+        )
 
         async with self._session.begin():
-            result = await self._session.execute(sql, filters)
+            result = await self._session.execute(sql, safe_params)
             row = result.mappings().first()
             return dict(row) if row else None
 
@@ -79,17 +87,31 @@ class AuthRepository(BaseRepository):
             dict[str, Any] | None: Updated record if found, otherwise None.
 
         """
-        set_expr = ', '.join(f'{k} = :set_{k}' for k in update_data)
-        conditions = ' AND '.join(f'{k} = :{k}' for k in filters)
+        if not update_data:
+            raise NoUpdateDataException
+        if not filters:
+            raise NoFiltersException
 
-        params = {**{f'set_{k}': v for k, v in update_data.items()}, **filters}
+        set_clause, set_params = SecureQueryBuilder.build_set_clause(
+            'refresh_tokens',
+            list(update_data.keys()),
+            {f'set_{k}': v for k, v in update_data.items()},
+        )
 
-        sql = text(f"""
-            UPDATE refresh_tokens
-            SET {set_expr}
-            WHERE {conditions}
-            RETURNING *
-        """)
+        where_conditions = [(key, '=', key) for key in filters]
+        where_clause, where_params = SecureQueryBuilder.build_where_clause(
+            'refresh_tokens', where_conditions, filters
+        )
+
+        # Combine parameters
+        params = {**set_params, **where_params}
+
+        sql = text(
+            'UPDATE refresh_tokens '
+            'SET ' + set_clause + ' '
+            'WHERE ' + where_clause + ' '
+            'RETURNING *'
+        )
         async with self._session.begin():
             result = await self._session.execute(sql, params)
             row = result.mappings().first()
@@ -102,12 +124,15 @@ class AuthRepository(BaseRepository):
             **filters (Any): Column-value filters to identify the token.
 
         """
-        conditions = ' AND '.join(f'{k} = :{k}' for k in filters)
+        if not filters:
+            raise NoFiltersException
 
-        sql = text(f"""
-            DELETE FROM refresh_tokens
-            WHERE {conditions}
-        """)
+        where_conditions = [(key, '=', key) for key in filters]
+        where_clause, safe_params = SecureQueryBuilder.build_where_clause(
+            'refresh_tokens', where_conditions, filters
+        )
+
+        sql = text('DELETE FROM refresh_tokens WHERE ' + where_clause)
 
         async with self._session.begin():
-            await self._session.execute(sql, filters)
+            await self._session.execute(sql, safe_params)

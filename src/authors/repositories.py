@@ -3,6 +3,7 @@ from typing import Any, cast
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.base.query_builder import SecureQueryBuilder
 from src.base.repositories import BaseRepository
 
 
@@ -58,18 +59,25 @@ class AuthorRepository(BaseRepository):
             otherwise None.
 
         """
-        conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
+        if not filters:
+            return None
 
-        sql = text(f"""
-            SELECT id, email, name, biography, birth_year,
-             nationality, created_at, password
-            FROM authors
-            WHERE {conditions}
-            LIMIT 1
-        """)
+        # Build safe WHERE clause using SecureQueryBuilder
+        conditions = [(key, '=', key) for key in filters]
+        where_clause, safe_params = SecureQueryBuilder.build_where_clause(
+            'authors', conditions, filters
+        )
+
+        sql = text(
+            'SELECT id, email, name, biography, birth_year, '
+            'nationality, created_at, password '
+            'FROM authors '
+            'WHERE ' + where_clause + ' '
+            'LIMIT 1'
+        )
 
         async with self._session.begin():
-            result = await self._session.execute(sql, filters)
+            result = await self._session.execute(sql, safe_params)
             row = result.mappings().first()
             return dict(row) if row else None
 
