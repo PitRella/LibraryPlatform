@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from src.auth.exceptions import WrongCredentialsException
@@ -24,8 +26,10 @@ class AuthService(BaseService):
         if not author_password or not Hasher.verify_password(password, author_password):
             raise WrongCredentialsException
 
-    async def auth_user(self, email: str, password: str) -> Author:
+    async def auth_user(self, email: str, password: str) -> dict[str, Any]:
         author_data = await self._author_repo.get_object(email=email)
-        author_password = author_data.get('password')
+        if not author_data:
+            raise WrongCredentialsException
+        author_password = author_data.get('password', '')
         self._verify_user_password(author_password, password)
         return author_data
