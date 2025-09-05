@@ -58,3 +58,14 @@ class BookRepository(BaseRepository):
             result = await self._session.execute(sql, params)
             row = result.mappings().first()
             return dict(row) if row else None
+
+    async def delete_object(self, **filters: Any) -> None:
+        conditions = " AND ".join(f"{k} = :{k}" for k in filters.keys())
+
+        sql = text(f"""
+            DELETE FROM books
+            WHERE {conditions}
+        """)
+
+        async with self._session.begin():
+            await self._session.execute(sql, filters)

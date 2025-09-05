@@ -38,7 +38,7 @@ class BooksService(BaseService):
             book_id: int,
             update_book_schema: UpdateBookRequestSchema
     ):
-        book = await self._repo.get_object(id=book_id)
+        book = await self._repo.get_object(id=book_id) # TODO: Remove duplicate
         if not book or author['id'] != book['author_id']:
             raise BookPermissionException
         filtered_book_fields: dict[str, str] = (
@@ -49,3 +49,13 @@ class BooksService(BaseService):
             id=book_id
         )
         return updated_book
+
+    async def delete_book(
+            self,
+            author: dict[str, Any],
+            book_id: int,
+    ):
+        book = await self._repo.get_object(id=book_id)  # TODO: Remove duplicate
+        if not book or author['id'] != book['author_id']:
+            raise BookPermissionException
+        await self._repo.delete_object(id=book_id)

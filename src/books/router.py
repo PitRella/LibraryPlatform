@@ -19,7 +19,7 @@ async def create_book(
         ],
         book_schema: CreateBookRequestSchema,
         service: Annotated[BooksService, Depends(get_service(BooksService))],
-) -> None:
+) -> None: #TODO: Return book info
     await service.create_book(author, book_schema)
 
 
@@ -47,3 +47,16 @@ async def update_book(
         update_book_schema=update_book_schema
     )
     return GetBookResponseSchema.model_validate(updated_book)
+
+@books_router.delete('/{book_id}', description='Delete book', status_code=204)
+async def delete_book(
+        book_id: int,
+        author: Annotated[
+            dict[str, Any], Depends(get_author_from_token)
+        ],
+        service: Annotated[BooksService, Depends(get_service(BooksService))],
+) -> None:
+    updated_book = await service.delete_book(
+        author=author,
+        book_id=book_id,
+    )
