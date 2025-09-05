@@ -67,12 +67,12 @@ class TokenManager:
     @classmethod
     def validate_refresh_token_expired(
         cls,
-        refresh_token_model: RefreshToken,
+        refresh_token_model: dict[str, Any],
     ) -> None:
         current_date: datetime = datetime.now(UTC)
         refresh_token_expire_date: datetime = (
-            refresh_token_model.created_at
-            + timedelta(seconds=refresh_token_model.expires_in)
+            refresh_token_model['created_at']
+            + timedelta(seconds=refresh_token_model['expires_in'])
         )
         if current_date >= refresh_token_expire_date:
             raise RefreshTokenException
