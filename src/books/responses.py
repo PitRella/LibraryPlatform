@@ -8,7 +8,7 @@ UNAUTHORIZED_RESPONSE = {
             'application/json': {
                 'example': {'detail': 'Could not validate credentials'}
             }
-        }
+        },
     }
 }
 
@@ -28,7 +28,7 @@ VALIDATION_ERROR_RESPONSE = {
                     ]
                 }
             }
-        }
+        },
     }
 }
 
@@ -39,7 +39,7 @@ NOT_FOUND_RESPONSE = {
             'application/json': {
                 'example': {'detail': 'Book with ID 999 not found'}
             }
-        }
+        },
     }
 }
 
@@ -50,7 +50,7 @@ FORBIDDEN_RESPONSE = {
             'application/json': {
                 'example': {'detail': 'You can only update your own books'}
             }
-        }
+        },
     }
 }
 
@@ -73,7 +73,7 @@ GET_BOOKS_RESPONSES = {
                     'next_cursor': 2,
                 }
             }
-        }
+        },
     },
     400: {
         'description': 'Bad Request - Invalid parameters',
@@ -81,7 +81,7 @@ GET_BOOKS_RESPONSES = {
             'application/json': {
                 'example': {'detail': 'Invalid filter parameters'}
             }
-        }
+        },
     },
     **VALIDATION_ERROR_RESPONSE,
 }
@@ -97,7 +97,7 @@ CREATE_BOOK_RESPONSES = {
             'application/json': {
                 'example': {'detail': 'Invalid book data provided'}
             }
-        }
+        },
     },
     **UNAUTHORIZED_RESPONSE,
     **VALIDATION_ERROR_RESPONSE,
@@ -116,7 +116,7 @@ GET_BOOK_RESPONSES = {
                     'published_year': 1597,
                 }
             }
-        }
+        },
     },
     **NOT_FOUND_RESPONSE,
     **VALIDATION_ERROR_RESPONSE,
@@ -135,7 +135,7 @@ UPDATE_BOOK_RESPONSES = {
                     'published_year': 2023,
                 }
             }
-        }
+        },
     },
     **UNAUTHORIZED_RESPONSE,
     **FORBIDDEN_RESPONSE,
@@ -154,24 +154,32 @@ DELETE_BOOK_RESPONSES = {
 IMPORT_BOOKS_RESPONSES = {
     201: {
         'description': 'Books successfully imported',
-        'content': {'application/json': {'example': {'imported': 5, 'book_ids': [1, 2, 3, 4, 5]}}},
+        'content': {
+            'application/json': {
+                'example': {'imported': 5, 'book_ids': [1, 2, 3, 4, 5]}
+            }
+        },
     },
     400: {
         'description': 'Bad Request - Invalid file format or content',
         'content': {
             'application/json': {
-                'example': {'detail': 'Invalid file format. Only JSON and CSV are supported.'}
+                'example': {
+                    'detail': 'Invalid file format. Only JSON and CSV are supported.'
+                }
             }
-        }
+        },
     },
     **UNAUTHORIZED_RESPONSE,
     413: {
         'description': 'File too large',
         'content': {
             'application/json': {
-                'example': {'detail': 'File size exceeds maximum allowed size of 10MB'}
+                'example': {
+                    'detail': 'File size exceeds maximum allowed size of 10MB'
+                }
             }
-        }
+        },
     },
     **VALIDATION_ERROR_RESPONSE,
 }

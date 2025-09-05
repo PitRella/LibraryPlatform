@@ -17,7 +17,7 @@ VALIDATION_ERROR_RESPONSE = {
                     ]
                 }
             }
-        }
+        },
     }
 }
 
@@ -30,10 +30,8 @@ CREATE_AUTHOR_RESPONSES = {
     400: {
         'description': 'Bad Request - Invalid author data',
         'content': {
-            'application/json': {
-                'example': {'detail': 'Email already exists'}
-            }
-        }
+            'application/json': {'example': {'detail': 'Email already exists'}}
+        },
     },
     **VALIDATION_ERROR_RESPONSE,
 }

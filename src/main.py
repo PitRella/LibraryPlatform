@@ -15,10 +15,10 @@ settings = Settings.load()
 configure_logging()
 
 app = FastAPI(
-    title="Library Platform API",
-    description="API for managing books and authors",
-    version="1.0.0",
-    contact={"name": "Serhii Kryvtsun", "tg": "@pitrella"},
+    title='Library Platform API',
+    description='API for managing books and authors',
+    version='1.0.0',
+    contact={'name': 'Serhii Kryvtsun', 'tg': '@pitrella'},
 )
 app.add_middleware(GlobalExceptionMiddleware)  # type: ignore
 

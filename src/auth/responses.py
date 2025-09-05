@@ -8,7 +8,7 @@ UNAUTHORIZED_RESPONSE = {
             'application/json': {
                 'example': {'detail': 'Could not validate credentials'}
             }
-        }
+        },
     }
 }
 
@@ -28,7 +28,7 @@ VALIDATION_ERROR_RESPONSE = {
                     ]
                 }
             }
-        }
+        },
     }
 }
 
@@ -44,7 +44,7 @@ LOGIN_RESPONSES = {
                     'token_type': 'Bearer',
                 }
             }
-        }
+        },
     },
     401: {
         'description': 'Invalid credentials',
@@ -52,7 +52,7 @@ LOGIN_RESPONSES = {
             'application/json': {
                 'example': {'detail': 'Incorrect email or password'}
             }
-        }
+        },
     },
     **VALIDATION_ERROR_RESPONSE,
 }
@@ -70,7 +70,7 @@ GET_ME_RESPONSES = {
                     'nationality': 'United Kingdom',
                 }
             }
-        }
+        },
     },
     **UNAUTHORIZED_RESPONSE,
 }
@@ -86,7 +86,7 @@ REFRESH_TOKEN_RESPONSES = {
                     'token_type': 'Bearer',
                 }
             }
-        }
+        },
     },
     401: {
         'description': 'Invalid or expired refresh token',
@@ -94,7 +94,7 @@ REFRESH_TOKEN_RESPONSES = {
             'application/json': {
                 'example': {'detail': 'Invalid or expired refresh token'}
             }
-        }
+        },
     },
     **VALIDATION_ERROR_RESPONSE,
 }
@@ -107,7 +107,7 @@ LOGOUT_RESPONSES = {
             'application/json': {
                 'example': {'detail': 'Invalid or expired refresh token'}
             }
-        }
+        },
     },
     **VALIDATION_ERROR_RESPONSE,
 }
