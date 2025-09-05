@@ -6,6 +6,7 @@ from pydantic import Field, EmailStr, field_validator
 
 from src.authors.exceptions import BadPasswordSchemaException
 from src.base.schemas import BaseSchema
+from pydantic import BaseModel
 
 PASSWORD_PATTERN = re.compile(
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
@@ -66,3 +67,10 @@ class CreateAuthorRequestSchema(BaseSchema):
         if not PASSWORD_PATTERN.match(value):
             raise BadPasswordSchemaException()
         return value
+
+class GetAuthorResponseSchema(BaseModel):
+    email: EmailStr
+    name: str
+    biography: str
+    birth_year: int
+    nationality: str
