@@ -1,4 +1,4 @@
-from typing import final
+from typing import final, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel

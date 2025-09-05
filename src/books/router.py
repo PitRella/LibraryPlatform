@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
 from src.books.schemas import CreateBookRequestSchema, GetBookResponseSchema, \
-    UpdateBookRequestSchema
+    UpdateBookRequestSchema, CreateBookResponseSchema
 from src.books.service import BooksService
 
 books_router = APIRouter(prefix='/books', tags=['books'])
@@ -19,9 +19,9 @@ async def create_book(
         ],
         book_schema: CreateBookRequestSchema,
         service: Annotated[BooksService, Depends(get_service(BooksService))],
-) -> None: #TODO: Return book info
-    await service.create_book(author, book_schema)
-
+) -> CreateBookResponseSchema:
+    book_id: int = await service.create_book(author, book_schema)
+    return CreateBookResponseSchema(id=book_id)
 
 @books_router.get('/{book_id}', description='Get a book')
 async def get_book(

@@ -27,6 +27,8 @@ class CreateBookRequestSchema(BaseSchema):
         description="Book published year"
     )]
 
+class CreateBookResponseSchema(BaseSchema):
+    id: int
 
 class UpdateBookRequestSchema(BaseSchema):
     title: Annotated[str | None, Field(
@@ -54,3 +56,4 @@ class GetBookResponseSchema(BaseSchema):
     genre: BookGenre
     language: BookLanguage
     published_year: int
+
