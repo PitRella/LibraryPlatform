@@ -26,7 +26,7 @@ class BooksService(BaseService):
         book_id: int = await self._repo.create_object(book_data)
         return book_id
 
-    async def get_book(self, book_id: int):
+    async def get_book(self, book_id: int) -> dict[str, Any]:
         book = await self._repo.get_object(id=book_id)
         if not book:
             raise BookNotFoundException
@@ -37,25 +37,28 @@ class BooksService(BaseService):
             author: dict[str, Any],
             book_id: int,
             update_book_schema: UpdateBookRequestSchema
-    ):
+    ) -> dict[str, Any]:
         book = await self._repo.get_object(id=book_id) # TODO: Remove duplicate
         if not book or author['id'] != book['author_id']:
             raise BookPermissionException
-        filtered_book_fields: dict[str, str] = (
+        filtered_book_fields: dict[str, Any] = (
             self._validate_schema_for_update_request(update_book_schema)
         )
-        updated_book = await self._repo.update_object(
+        updated_book: dict[str, Any] | None = await self._repo.update_object(
             filtered_book_fields,
             id=book_id
         )
+        if not updated_book:
+            raise BookNotFoundException
         return updated_book
 
     async def delete_book(
             self,
             author: dict[str, Any],
             book_id: int,
-    ):
+    ) -> None:
         book = await self._repo.get_object(id=book_id)  # TODO: Remove duplicate
         if not book or author['id'] != book['author_id']:
             raise BookPermissionException
         await self._repo.delete_object(id=book_id)
+        return None

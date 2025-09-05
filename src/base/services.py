@@ -21,7 +21,7 @@ class BaseService:
     @final
     def _validate_schema_for_update_request(
             schema: BaseModel,
-    ) -> dict[str, str]:
+    ) -> dict[str, Any]:
         schema_fields: dict[str, str] = schema.model_dump(
             exclude_none=True,
             exclude_unset=True,
