@@ -15,6 +15,14 @@ class BooksService(BaseService):
     ) -> None:
         super().__init__(db_session, repo=BookRepository(db_session))
 
+    @staticmethod
+    def _validate_author_permission(
+            book: dict[str, Any] | None,
+            author: dict[str, Any]
+    ) -> None:
+        if not book or author['id'] != book['author_id']:
+            raise BookPermissionException
+
     async def create_book(
             self,
             author: dict[str, Any],
@@ -38,9 +46,10 @@ class BooksService(BaseService):
             book_id: int,
             update_book_schema: UpdateBookRequestSchema
     ) -> dict[str, Any]:
-        book = await self._repo.get_object(id=book_id) # TODO: Remove duplicate
-        if not book or author['id'] != book['author_id']:
-            raise BookPermissionException
+        book = await self._repo.get_object(
+            id=book_id
+        )
+        self._validate_author_permission(book, author)
         filtered_book_fields: dict[str, Any] = (
             self._validate_schema_for_update_request(update_book_schema)
         )
@@ -57,8 +66,8 @@ class BooksService(BaseService):
             author: dict[str, Any],
             book_id: int,
     ) -> None:
-        book = await self._repo.get_object(id=book_id)  # TODO: Remove duplicate
-        if not book or author['id'] != book['author_id']:
-            raise BookPermissionException
+
+        book = await self._repo.get_object(id=book_id)
+        self._validate_author_permission(book, author)
         await self._repo.delete_object(id=book_id)
         return None
