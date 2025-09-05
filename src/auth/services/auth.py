@@ -98,3 +98,30 @@ class AuthService(BaseService):
             raise RefreshTokenException
         await self._repo.delete_object(id=refresh_token_model['id'])
         return None
+
+    @staticmethod
+    def _get_user_id_from_jwt(decoded_jwt: dict[str, str | int]) -> str:
+        """Extract and return user ID from a decoded JWT payload.
+
+        Raises WrongCredentialsException if user ID is missing or invalid.
+
+        Returns:
+            str: User ID extracted from JWT.
+
+        """
+        user_id: int | str | None = decoded_jwt.get('sub')
+        if not user_id or isinstance(user_id, int):
+            raise WrongCredentialsException
+        return user_id
+
+    async def validate_token_for_user(
+        self, user_jwt_token: str
+    ) -> int | str:
+        decoded_jwt: dict[str, str | int] = TokenManager.decode_access_token(
+            token=user_jwt_token,
+        )
+        TokenManager.validate_access_token_expired(decoded_jwt)
+        user_id: int | str = self._get_user_id_from_jwt(decoded_jwt)
+        if not user_id:
+            raise WrongCredentialsException
+        return user_id
