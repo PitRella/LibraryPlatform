@@ -7,6 +7,13 @@ from typing import Any
 
 from fastapi import UploadFile
 
+from src.books.exceptions import (
+    ImportUnsupportedFormatException,
+    ImportMissingFilenameException,
+    ImportInvalidJSONStructureException,
+    ImportInvalidCSVStructureException,
+)
+
 
 class FileBookImporter(ABC):
     @abstractmethod
@@ -19,26 +26,36 @@ class BookImporterFactory:
     def get_importer(file: UploadFile) -> FileBookImporter:
         filename: str | None = file.filename
         if not filename:
-            raise ValueError("File must have a filename")
+            raise ImportMissingFilenameException()
         if filename.endswith(".json"):
             return JSONBookImporter()
         elif filename.endswith(".csv"):
             return CSVBookImporter()
         else:
-            raise ValueError("Unsupported file format. Use .json or .csv")
+            raise ImportUnsupportedFormatException()
 
 
 class JSONBookImporter(FileBookImporter):
     async def parse(self, file: UploadFile) -> list[dict[str, Any]]:
         content = await file.read()
-        data = json.loads(content.decode("utf-8"))
+        try:
+            data = json.loads(content.decode("utf-8"))
+        except Exception:
+            raise ImportInvalidJSONStructureException()
         if not isinstance(data, list):
-            raise ValueError("JSON must contain an array of books")
+            raise ImportInvalidJSONStructureException()
         return data
 
 
 class CSVBookImporter(FileBookImporter):
+    REQUIRED_HEADERS = {"title", "genre", "language", "published_year"}
+
     async def parse(self, file: UploadFile) -> list[dict[str, Any]]:
         content = await file.read()
-        reader = csv.DictReader(StringIO(content.decode("utf-8")))
+        try:
+            reader = csv.DictReader(StringIO(content.decode("utf-8")))
+        except Exception:
+            raise ImportInvalidCSVStructureException()
+        if not reader.fieldnames or not set(reader.fieldnames) >= self.REQUIRED_HEADERS:
+            raise ImportInvalidCSVStructureException()
         return list(reader)
