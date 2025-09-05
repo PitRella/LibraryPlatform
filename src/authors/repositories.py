@@ -28,7 +28,7 @@ class AuthorRepository(BaseRepository):
         conditions = " AND ".join(f"{key} = :{key}" for key in filters.keys())
 
         sql = text(f"""
-            SELECT id, email, name, biography, birth_year, nationality, created_at
+            SELECT id, email, name, biography, birth_year, nationality, created_at, password
             FROM authors
             WHERE {conditions}
             LIMIT 1
