@@ -61,7 +61,8 @@ class AuthorRepository(BaseRepository):
         conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
 
         sql = text(f"""
-            SELECT id, email, name, biography, birth_year, nationality, created_at, password
+            SELECT id, email, name, biography, birth_year,
+             nationality, created_at, password
             FROM authors
             WHERE {conditions}
             LIMIT 1
@@ -73,7 +74,7 @@ class AuthorRepository(BaseRepository):
             return dict(row) if row else None
 
     async def delete_object(self, **filters: Any) -> None:
-        """Deleting authors is not implemented.
+        """Delete authors is not implemented.
 
         Raises:
             NotImplementedError: Always raised.
@@ -86,7 +87,7 @@ class AuthorRepository(BaseRepository):
         update_data: dict[str, Any],
         **filters: Any,
     ) -> dict[str, Any] | None:
-        """Updating authors is not implemented.
+        """Update authors is not implemented.
 
         Args:
             update_data (dict[str, Any]): Fields to update.

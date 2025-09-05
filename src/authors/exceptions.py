@@ -13,7 +13,7 @@ class BadPasswordSchemaException(AuthorException):
     """
 
     def __init__(self) -> None:
-        """Initialize BadPasswordSchemaException with status code 422 (Unprocessable Entity)."""
+        """Initialize BadPasswordSchemaException with status code 422."""
         super().__init__(
             status_code=422,
             detail=(
@@ -28,7 +28,7 @@ class AuthorNotFoundByIdException(AuthorException):
     """Raised when an author with the specified ID does not exist."""
 
     def __init__(self) -> None:
-        """Initialize AuthorNotFoundByIdException with status code 404 (Not Found)."""
+        """Initialize AuthorNotFoundByIdException with status code 404."""
         super().__init__(
             status_code=404,
             detail='Author by this id not found.',

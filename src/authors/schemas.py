@@ -1,4 +1,5 @@
 import re
+from datetime import UTC
 from datetime import datetime as dt
 from typing import Annotated
 
@@ -58,7 +59,7 @@ class CreateAuthorRequestSchema(BaseSchema):
             min_length=16,
             max_length=512,
             pattern=r'^[a-zA-Z0-9\s\.\,\!\?\-\'\"]+$',
-            example='I am a passionate writer who loves creating fictional worlds.',
+            example='I am a passionate writer who loves creating worlds.',
             description="Author's biography",
         ),
     ]
@@ -68,7 +69,7 @@ class CreateAuthorRequestSchema(BaseSchema):
         Field(
             default=None,
             ge=1900,
-            le=dt.now().year,
+            le=dt.now(UTC).year,
             example=1985,
             description="Author's year of birth",
         ),
@@ -100,7 +101,7 @@ class CreateAuthorRequestSchema(BaseSchema):
 
         """
         if not PASSWORD_PATTERN.match(value):
-            raise BadPasswordSchemaException()
+            raise BadPasswordSchemaException
         return value
 
 

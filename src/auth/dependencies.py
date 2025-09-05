@@ -35,7 +35,7 @@ async def get_author_from_token(
 
     Raises:
         AuthorizationException: If the token is invalid or expired.
-        AuthorNotFoundByIdException: If no author exists for the extracted author ID.
+        AuthorNotFoundByIdException: If no author exists by ID.
 
     """
     author_id = await auth_service.validate_token_for_user(token)

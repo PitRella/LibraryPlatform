@@ -38,7 +38,9 @@ class RefreshToken(PrimaryKeyMixin):
     )
 
     def __repr__(self) -> str:
+        """Return a string representation of the RefreshToken instance."""
         return (
             f'<RefreshToken(id={self.id}, author_id={self.author_id}, '
-            f'refresh_token={self.refresh_token}, expires_in={self.expires_in})>'
+            f'refresh_token={self.refresh_token},'
+            f' expires_in={self.expires_in})>'
         )

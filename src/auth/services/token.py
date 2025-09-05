@@ -17,7 +17,7 @@ settings = Settings.load()
 
 
 class TokenManager:
-    """Manager for creating, decoding, and validating JWT access and refresh tokens."""
+    """Manager for creating, decoding, and validating JWT tokens."""
 
     @staticmethod
     def _get_expiration_delta() -> datetime:
@@ -30,7 +30,7 @@ class TokenManager:
         """Generate a JWT access token for the given author ID.
 
         Args:
-            author_id (int): The ID of the author for whom the token is generated.
+            author_id (int): The ID of the author for whom the token.
 
         Returns:
             str: Encoded JWT access token.
@@ -51,7 +51,7 @@ class TokenManager:
         """Generate a new refresh token UUID and its expiration timedelta.
 
         Returns:
-            tuple[uuid.UUID, timedelta]: Refresh token and its expiration duration.
+            tuple[uuid.UUID, timedelta]: Refresh token and its expiration.
 
         """
         return uuid.uuid4(), timedelta(
@@ -69,7 +69,7 @@ class TokenManager:
             dict[str, str | int]: Decoded token payload.
 
         Raises:
-            WrongCredentialsException: If the token is invalid or cannot be decoded.
+            WrongCredentialsException: If a token is invalid can't be decoded.
 
         """
         try:
@@ -104,10 +104,10 @@ class TokenManager:
     def validate_refresh_token_expired(
         cls, refresh_token_model: dict[str, Any]
     ) -> None:
-        """Validate whether a refresh token has expired based on its creation time and expiry.
+        """Validate whether a refresh token has expired based.
 
         Args:
-            refresh_token_model (dict[str, Any]): Refresh token record containing `created_at` and `expires_in`.
+            refresh_token_model (dict[str, Any]): Refresh token record.
 
         Raises:
             RefreshTokenException: If the refresh token is expired.

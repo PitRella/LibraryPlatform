@@ -56,7 +56,7 @@ class GlobalExceptionMiddleware:
             await self.app(scope, receive, send)
             return
 
-        request: Request = Request(scope, receive=receive)
+        Request(scope, receive=receive)
         request_id: str = str(uuid.uuid4())
         scope.setdefault('state', {})
         scope['state']['request_id'] = request_id
@@ -64,7 +64,7 @@ class GlobalExceptionMiddleware:
         try:
             await self.app(scope, receive, send)
         except Exception as exc:
-            if isinstance(exc, (HTTPException, StarletteHTTPException)):
+            if isinstance(exc, HTTPException | StarletteHTTPException):
                 # Re-raise HTTP exceptions so they can be handled properly
                 raise
 
@@ -74,7 +74,8 @@ class GlobalExceptionMiddleware:
                 status_code=500,
                 content={
                     'code': 'INTERNAL_SERVER_ERROR',
-                    'message': 'An unexpected error occurred. Please try again later.',
+                    'message': 'An unexpected error occurred. '
+                    'Please try again later.',
                     'request_id': request_id,
                     'timestamp': now,
                 },

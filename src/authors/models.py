@@ -44,4 +44,5 @@ class Author(PrimaryKeyMixin, TimeStampMixin):
     )
 
     def __repr__(self) -> str:
+        """Return a string representation of the Author instance."""
         return f'<Author(id={self.id}, name="{self.name}")>'
