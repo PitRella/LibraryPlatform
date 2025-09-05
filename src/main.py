@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, FastAPI
 
 from src.auth.router import auth_router
+from src.books.router import books_router
 from src.logger import configure_logging
 from src.settings import Settings
 from src.authors.router import author_router
@@ -16,6 +17,7 @@ app = FastAPI(title='LibraryPlatform')
 main_api_router = APIRouter(prefix='/api/v1')
 main_api_router.include_router(author_router)
 main_api_router.include_router(auth_router)
+main_api_router.include_router(books_router)
 
 app.include_router(main_api_router)
 
