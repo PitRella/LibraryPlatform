@@ -14,8 +14,14 @@ class BaseRepository:
         pass
 
     async def update_object(
-        self,
-        update_data: dict[str, Any],
-        **filters: Any,
+            self,
+            update_data: dict[str, Any],
+            **filters: Any,
     ) -> dict[str, Any] | None:
+        pass
+
+    async def delete_object(
+            self,
+            **filters: Any
+    ) -> None:
         pass

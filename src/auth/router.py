@@ -67,3 +67,15 @@ async def refresh_token(
         httponly=True,
     )
     return token
+
+
+@auth_router.delete(path='/logout', status_code=204)
+async def logout_user(
+    request: Request,
+    response: Response,
+    service: Annotated[AuthService, Depends(get_service(AuthService))],
+) -> None:
+    await service.logout_user(request.cookies.get('refresh_token'))
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    return None
