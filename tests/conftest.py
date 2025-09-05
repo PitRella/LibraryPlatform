@@ -77,9 +77,8 @@ async def test_client(test_session: AsyncSession) -> TestClient:
         yield test_session
     
     def override_get_service(service_type):
-        def _get_service():
-            print(f"DEBUG: Creating service {service_type} with session type: {type(test_session)}")
-            return service_type(db_session=test_session)
+        def _get_service(db: AsyncSession = test_session):
+            return service_type(db_session=db)
         return _get_service
     
     # Clear any existing overrides first
@@ -170,7 +169,7 @@ async def auth_headers(test_client: TestClient, sample_author_data):
     """Get authentication headers for testing."""
     # Create author
     response = test_client.post("/api/v1/author/", json=sample_author_data)
-    assert response.status_code == 200
+    assert response.status_code == 201
     
     # Login
     login_data = {
