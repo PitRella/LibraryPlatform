@@ -1,10 +1,24 @@
 from dataclasses import dataclass, asdict
+from typing import Any
+
+from src.base.dto import BaseDTO
+from src.books.enum import BookGenre, BookLanguage
 
 
 @dataclass
-class ImportedBooksDTO:
+class ImportedBooksDTO(BaseDTO):
     imported: int
     book_ids: list[int]
 
-    def to_dict(self) -> dict:
-        return asdict(self)
+
+@dataclass
+class GetBooksParamsResponseDTO(BaseDTO):
+    limit: int | None = None
+    cursor: int | None = None
+    title: str | None = None
+    genre: BookGenre | None = None
+    language: BookLanguage | None = None
+    author_id: int | None = None
+    published_year: int | None = None
+    year_from: int | None = None
+    year_to: int | None = None

@@ -3,7 +3,8 @@ from datetime import datetime as dt, timezone
 from src.base.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.books.dto import ImportedBooksDTO
+from src.books.dto import ImportedBooksDTO, GetBooksParamsResponseDTO
+from src.books.enum import BookLanguage, BookGenre
 from src.books.exceptions import BookPermissionException, BookNotFoundException
 from src.books.repositories import BookRepository
 from src.books.schemas import CreateBookRequestSchema, UpdateBookRequestSchema
@@ -95,36 +96,33 @@ class BooksService(BaseService):
             year_from: int | None = None,
             year_to: int | None = None,
     ) -> dict[str, Any]:
-
         filters: list[str] = []
-        params: dict[str, Any] = {"limit": limit + 1}
-
+        params_d = GetBooksParamsResponseDTO(limit=limit + 1)
         if cursor is not None:
             filters.append("id > :cursor")
-            params["cursor"] = cursor
+            params_d.cursor = cursor
         if title is not None:
             filters.append("title = :title")
-            params["title"] = title
+            params_d.title = title
         if genre is not None:
             filters.append("genre = :genre")
-            params["genre"] = genre
+            params_d.genre = BookGenre(genre)
         if language is not None:
             filters.append("language = :language")
-            params["language"] = language
+            params_d.language = BookLanguage(language)
         if author_id is not None:
             filters.append("author_id = :author_id")
-            params["author_id"] = author_id
+            params_d.author_id = author_id
         if published_year is not None:
             filters.append("published_year = :published_year")
-            params["published_year"] = published_year
+            params_d.published_year = published_year
         if year_from is not None:
             filters.append("published_year >= :year_from")
-            params["year_from"] = year_from
+            params_d.year_from = year_from
         if year_to is not None:
             filters.append("published_year <= :year_to")
-            params["year_to"] = year_to
-
-        rows = await self._repo.list_objects(filters, params)
+            params_d.year_to = year_to
+        rows = await self._repo.list_objects(filters, params_d.to_dict())
         items = rows[:limit]
         next_cursor = items[-1]['id'] if len(rows) > limit else None
         return {"items": items, "next_cursor": next_cursor}
