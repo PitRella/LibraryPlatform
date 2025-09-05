@@ -1,7 +1,6 @@
-from typing import Annotated, Any
+from typing import Annotated, Any, TypeVar
 
-from fastapi import APIRouter, Depends
-
+from fastapi import Depends, Query, APIRouter, Path
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
 from src.books.schemas import CreateBookRequestSchema, GetBookResponseSchema, \
@@ -9,6 +8,14 @@ from src.books.schemas import CreateBookRequestSchema, GetBookResponseSchema, \
 from src.books.service import BooksService
 
 books_router = APIRouter(prefix='/books', tags=['books'])
+
+@books_router.get('/all')
+async def get_all_books(
+        service: Annotated[BooksService, Depends(get_service(BooksService))],
+        limit: int = Query(10, gt=0, le=100),
+        cursor: int | None = Query(None),
+):
+    books = await service.get_all_books(limit, cursor)
 
 
 @books_router.post('/',
@@ -23,10 +30,11 @@ async def create_book(
     book_id: int = await service.create_book(author, book_schema)
     return CreateBookResponseSchema(id=book_id)
 
+
 @books_router.get('/{book_id}', description='Get a book')
 async def get_book(
-        book_id: int,
         service: Annotated[BooksService, Depends(get_service(BooksService))],
+        book_id: int = Path(..., ge=1, description='Book ID'),
 ) -> GetBookResponseSchema:
     book_data = await service.get_book(book_id)
     return GetBookResponseSchema.model_validate(book_data)
@@ -34,12 +42,12 @@ async def get_book(
 
 @books_router.patch('/{book_id}', description='Change book parameters')
 async def update_book(
-        book_id: int,
         author: Annotated[
             dict[str, Any], Depends(get_author_from_token)
         ],
         update_book_schema: UpdateBookRequestSchema,
         service: Annotated[BooksService, Depends(get_service(BooksService))],
+        book_id: int = Path(..., ge=1, description='Book ID'),
 ) -> GetBookResponseSchema:
     updated_book = await service.update_book(
         author=author,
@@ -48,13 +56,15 @@ async def update_book(
     )
     return GetBookResponseSchema.model_validate(updated_book)
 
+
 @books_router.delete('/{book_id}', description='Delete book', status_code=204)
 async def delete_book(
-        book_id: int,
         author: Annotated[
             dict[str, Any], Depends(get_author_from_token)
         ],
         service: Annotated[BooksService, Depends(get_service(BooksService))],
+        book_id: int = Path(..., ge=1, description='Book ID'),
+
 ) -> None:
     await service.delete_book(
         author=author,

@@ -66,8 +66,10 @@ class BooksService(BaseService):
             author: dict[str, Any],
             book_id: int,
     ) -> None:
-
         book = await self._repo.get_object(id=book_id)
         self._validate_author_permission(book, author)
         await self._repo.delete_object(id=book_id)
         return None
+
+    async def get_all_books(self, limit:int, cursor: int | None ):
+        await self._repo.list_objects()
