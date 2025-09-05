@@ -1,10 +1,11 @@
-from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql.schema import ForeignKey, UniqueConstraint
 
 from src.base.mixins import PrimaryKeyMixin, TimeStampMixin
+from src.books.models import Book
 
 
 class Author(PrimaryKeyMixin, TimeStampMixin):
@@ -38,6 +39,13 @@ class Author(PrimaryKeyMixin, TimeStampMixin):
         String(100),
         nullable=True
     )
+    books: Mapped[List["Book"]] = relationship(
+        'Book',
+        back_populates='author',
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self) -> str:
         return f'<Author(id={self.id}, name="{self.name}")>'
+
+
