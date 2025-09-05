@@ -15,13 +15,15 @@ books_router = APIRouter(prefix='/books', tags=['books'])
 @books_router.get('/all')
 async def get_all_books(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
-        limit: int = Query(10, gt=0, le=100),
-        cursor: int | None = Query(None),
+        limit: int = Query(10, gt=0, le=100, description='Limit of books'),
+        cursor: int | None = Query(None, description='Cursor for pagination'),
         title: str | None = Query(
             None,
             min_length=1,
             max_length=50,
-            pattern=r'^[a-zA-Z\s\-\'\.]+$'
+            pattern=r'^[a-zA-Z\s\-\'\.]+$',
+            description='Book title',
+            examples=["Romeo and Juliet", "The Shining"],
         ),
         genre: BookGenre | None = None,
         language: BookLanguage | None = None,
@@ -29,6 +31,8 @@ async def get_all_books(
             None,
             ge=1800,
             le=dt.now().year,
+            description='Book published year',
+            examples=[1985, 2022],
         ),
         author_id: int | None = Query(None, ge=0),
 ) -> list[GetBookResponseSchema] | None:
