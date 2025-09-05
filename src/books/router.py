@@ -12,7 +12,7 @@ books_router = APIRouter(prefix='/books', tags=['books'])
 
 
 @books_router.post('/',
-                   description='Create a new book.')  # TODO: Return id or 204
+                   description='Create a new book.')
 async def create_book(
         author: Annotated[
             dict[str, Any], Depends(get_author_from_token)
@@ -56,7 +56,8 @@ async def delete_book(
         ],
         service: Annotated[BooksService, Depends(get_service(BooksService))],
 ) -> None:
-    updated_book = await service.delete_book(
+    await service.delete_book(
         author=author,
         book_id=book_id,
     )
+    return None
