@@ -14,9 +14,13 @@ logger = logging.getLogger(__name__)
 settings = Settings.load()
 configure_logging()
 
-app = FastAPI(title='LibraryPlatform')
-
-app.add_middleware(GlobalExceptionMiddleware)
+app = FastAPI(
+    title="Library Platform API",
+    description="API for managing books and authors",
+    version="1.0.0",
+    contact={"name": "Serhii Kryvtsun", "tg": "@pitrella"},
+)
+app.add_middleware(GlobalExceptionMiddleware)  # type: ignore
 
 main_api_router = APIRouter(prefix='/api/v1')
 main_api_router.include_router(author_router)
