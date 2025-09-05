@@ -8,10 +8,26 @@ from src.base.schemas import BaseSchema
 class TokenSchemas(BaseModel):
     """Schema representing access and refresh tokens.
 
+    This schema is returned after successful authentication and contains
+    the JWT tokens needed for API access. The access token is short-lived
+    and should be used for API requests, while the refresh token is long-lived
+    and used to obtain new access tokens.
+
     Attributes:
         access_token (str): JWT access token for authentication.
+            Expires in 15 minutes by default.
         refresh_token (str): JWT refresh token for obtaining new access tokens.
-        token_type (str): Type of token, defaults to 'Bearer'.
+            Expires in 30 days by default.
+        token_type (str): Type of token, always 'Bearer' for this API.
+
+    Example:
+        ```json
+        {
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "token_type": "Bearer"
+        }
+        ```
 
     """
 

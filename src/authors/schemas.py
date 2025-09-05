@@ -16,8 +16,40 @@ PASSWORD_PATTERN = re.compile(
 class CreateAuthorRequestSchema(BaseSchema):
     """Schema for creating a new author.
 
-    Validates email, password, name, and optional fields like biography,
-    birth year, and nationality.
+    This schema validates all required and optional fields for author registration.
+    It includes comprehensive validation for email format, password complexity,
+    name format, and optional biographical information.
+
+    Attributes:
+        email (EmailStr): Author's email address. Must be a valid email format,
+            between 6-128 characters.
+        password (str): Secure password. Must contain at least one lowercase letter,
+            one uppercase letter, one digit, and one special character (@$!%*?&).
+            Minimum 8 characters, maximum 128.
+        name (str): Author's full name. 2-50 characters, letters, spaces,
+            hyphens, apostrophes, and periods allowed.
+        biography (str | None): Optional biography. 16-512 characters if provided.
+            Letters, numbers, spaces, and basic punctuation allowed.
+        birth_year (int | None): Optional birth year. Must be between 1900 and
+            current year if provided.
+        nationality (str | None): Optional nationality. 2-50 characters if provided.
+            Letters, spaces, and hyphens allowed.
+
+    Example:
+        ```json
+        {
+            "email": "jane.doe@example.com",
+            "password": "SecurePass123!",
+            "name": "Jane Doe",
+            "biography": "A passionate writer with over 10 years of experience in fiction.",
+            "birth_year": 1985,
+            "nationality": "United States"
+        }
+        ```
+
+    Raises:
+        BadPasswordSchemaException: If password doesn't meet complexity requirements.
+
     """
 
     email: Annotated[

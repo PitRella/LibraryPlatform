@@ -11,12 +11,29 @@ from src.books.enum import BookGenre, BookLanguage
 class CreateBookRequestSchema(BaseSchema):
     """Schema for creating a new book.
 
+    This schema validates all required fields for book creation. It ensures
+    proper formatting of book title, validates genre and language enums,
+    and checks publication year constraints.
+
     Attributes:
-        title (str): Title of the book. 2-50 chars, letters, spaces, hyphens,
-                     apostrophes, periods allowed.
-        genre (BookGenre): Genre of the book.
-        language (BookLanguage): Language of the book.
-        published_year (int): Year of publication (1800-current year).
+        title (str): Title of the book. 2-50 characters, letters, spaces,
+            hyphens, apostrophes, periods allowed.
+        genre (BookGenre): Genre of the book. Must be one of: FICTION,
+            NON_FICTION, SCIENCE, HISTORY, FANTASY, COMEDY, DRAMA.
+        language (BookLanguage): Language of the book. Must be either
+            ENGLISH or UKRAINIAN.
+        published_year (int): Year of publication. Must be between 1800
+            and current year.
+
+    Example:
+        ```json
+        {
+            "title": "The Great Gatsby",
+            "genre": "FICTION",
+            "language": "ENGLISH",
+            "published_year": 1925
+        }
+        ```
 
     """
 
@@ -127,16 +144,36 @@ class UploadedBooksResponseSchema(BaseSchema):
 
 
 class BookFiltersSchema(BaseSchema):
-    """Schema for filtering books.
+    """Schema for filtering books in search operations.
+
+    This schema provides comprehensive filtering options for book searches.
+    All fields are optional, allowing for flexible query combinations.
+    Supports exact matches, range queries, and partial text matching.
 
     Attributes:
-        title (str | None): Filter by book title.
-        genre (BookGenre | None): Filter by genre.
-        language (BookLanguage | None): Filter by language.
-        published_year (int | None): Filter by exact published year.
-        year_from (int | None): Filter books published from this year.
-        year_to (int | None): Filter books published up to this year.
-        author_id (int | None): Filter by author ID.
+        title (str | None): Filter by book title. Partial matching supported.
+            1-50 characters if provided.
+        genre (BookGenre | None): Filter by exact genre match.
+        language (BookLanguage | None): Filter by exact language match.
+        published_year (int | None): Filter by exact publication year.
+        year_from (int | None): Filter books published from this year (inclusive).
+        year_to (int | None): Filter books published up to this year (inclusive).
+        author_id (int | None): Filter by specific author ID.
+
+    Example:
+        ```json
+        {
+            "title": "Gatsby",
+            "genre": "FICTION",
+            "language": "ENGLISH",
+            "year_from": 1900,
+            "year_to": 2000
+        }
+        ```
+
+    Note:
+        When both `published_year` and `year_from`/`year_to` are provided,
+        `published_year` takes precedence for exact year matching.
 
     """
 
