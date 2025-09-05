@@ -14,12 +14,22 @@ from src.base.services import BaseService
 
 
 class AuthService(BaseService):
+    """Service responsible for author authentication and JWT management."""
+
     def __init__(
         self,
         db_session: AsyncSession,
         auth_repo: BaseRepository | None = None,
         author_repo: BaseRepository | None = None,
     ) -> None:
+        """Initialize the authentication service.
+
+        Args:
+            db_session (AsyncSession): SQLAlchemy async session.
+            auth_repo (BaseRepository | None): Repository for refresh tokens.
+            author_repo (BaseRepository | None): Repository for authors.
+
+        """
         super().__init__(
             db_session, repo=auth_repo or AuthRepository(db_session)
         )
@@ -27,12 +37,35 @@ class AuthService(BaseService):
 
     @staticmethod
     def _verify_user_password(author_password: str, password: str) -> None:
+        """Verify that the provided password matches the stored password.
+
+        Args:
+            author_password (str): Hashed password from the database.
+            password (str): Plain password provided by user.
+
+        Raises:
+            WrongCredentialsException: If password does not match.
+
+        """
         if not author_password or not Hasher.verify_password(
             password, author_password
         ):
             raise WrongCredentialsException
 
     async def auth_user(self, email: str, password: str) -> dict[str, Any]:
+        """Authenticate an author using email and password.
+
+        Args:
+            email (str): Author's email.
+            password (str): Plain text password.
+
+        Returns:
+            dict[str, Any]: Author data from the database.
+
+        Raises:
+            WrongCredentialsException: If email or password are invalid.
+
+        """
         author_data = await self._author_repo.get_object(email=email)
         if not author_data:
             raise WrongCredentialsException
@@ -41,6 +74,15 @@ class AuthService(BaseService):
         return author_data
 
     async def create_token(self, author_id: int) -> TokenSchemas:
+        """Generate access and refresh tokens for an author.
+
+        Args:
+            author_id (int): ID of the author.
+
+        Returns:
+            TokenSchemas: Access and refresh tokens with token type.
+
+        """
         access_token: str = TokenManager.generate_access_token(
             author_id=author_id
         )
@@ -57,6 +99,18 @@ class AuthService(BaseService):
         )
 
     async def refresh_token(self, refresh_token: uuid.UUID) -> TokenSchemas:
+        """Refresh access and refresh tokens using a valid refresh token.
+
+        Args:
+            refresh_token (uuid.UUID): Existing refresh token.
+
+        Returns:
+            TokenSchemas: New access and refresh tokens.
+
+        Raises:
+            RefreshTokenException: If refresh token is invalid or expired.
+
+        """
         refresh_token_model = await self._repo.get_object(
             refresh_token=refresh_token
         )
@@ -91,6 +145,15 @@ class AuthService(BaseService):
         self,
         refresh_token: uuid.UUID | None,
     ) -> None:
+        """Logout a user by deleting their refresh token.
+
+        Args:
+            refresh_token (uuid.UUID | None): Refresh token to delete.
+
+        Raises:
+            RefreshTokenException: If token is invalid or missing.
+
+        """
         if not refresh_token:
             raise RefreshTokenException
         refresh_token_model = await self._repo.get_object(
@@ -102,12 +165,16 @@ class AuthService(BaseService):
 
     @staticmethod
     def _get_user_id_from_jwt(decoded_jwt: dict[str, str | int]) -> str:
-        """Extract and return user ID from a decoded JWT payload.
+        """Extract the user ID from a decoded JWT payload.
 
-        Raises WrongCredentialsException if user ID is missing or invalid.
+        Args:
+            decoded_jwt (dict[str, str | int]): Decoded JWT token.
 
         Returns:
-            str: User ID extracted from JWT.
+            str: User ID from JWT.
+
+        Raises:
+            WrongCredentialsException: If user ID is missing or invalid.
 
         """
         user_id: int | str | None = decoded_jwt.get('sub')
@@ -116,6 +183,18 @@ class AuthService(BaseService):
         return user_id
 
     async def validate_token_for_user(self, user_jwt_token: str) -> int | str:
+        """Validate an access token and extract the user ID.
+
+        Args:
+            user_jwt_token (str): JWT access token.
+
+        Returns:
+            int | str: User ID extracted from the token.
+
+        Raises:
+            WrongCredentialsException: If token is invalid or expired.
+
+        """
         decoded_jwt: dict[str, str | int] = TokenManager.decode_access_token(
             token=user_jwt_token,
         )
