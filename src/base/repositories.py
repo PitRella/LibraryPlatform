@@ -32,7 +32,7 @@ class BaseRepository(ABC):
         pass
 
 
-class ListableRepository(ABC):
+class ListableRepository(BaseRepository):
     @abstractmethod
     async def list_objects(
             self,

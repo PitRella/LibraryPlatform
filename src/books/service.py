@@ -11,9 +11,11 @@ from src.books.schemas import CreateBookRequestSchema, UpdateBookRequestSchema
 class BooksService(BaseService):
     def __init__(
             self,
-            db_session: AsyncSession
+            db_session: AsyncSession,
+            repo: BookRepository | None = None,
     ) -> None:
-        super().__init__(db_session, repo=BookRepository(db_session))
+        super().__init__(db_session)
+        self._repo: BookRepository = repo or BookRepository(db_session)
 
     @staticmethod
     def _validate_author_permission(
@@ -71,5 +73,5 @@ class BooksService(BaseService):
         await self._repo.delete_object(id=book_id)
         return None
 
-    async def get_all_books(self, limit:int, cursor: int | None ):
+    async def get_all_books(self, limit: int, cursor: int | None):
         await self._repo.list_objects()

@@ -3,10 +3,10 @@ from typing import Any
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.base.repositories import BaseRepository
+from src.base.repositories import ListableRepository
 
 
-class BookRepository(BaseRepository):
+class BookRepository(ListableRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
@@ -14,8 +14,9 @@ class BookRepository(BaseRepository):
         sql = text(
             """
             INSERT INTO books (title, genre, language, published_year,
-                                 author_id, created_at)
-            VALUES (:title, :genre, :language, :published_year, :author_id, :created_at)
+                               author_id, created_at)
+            VALUES (:title, :genre, :language, :published_year, :author_id,
+                    :created_at)
             RETURNING id
             """
         )
@@ -69,3 +70,10 @@ class BookRepository(BaseRepository):
 
         async with self._session.begin():
             await self._session.execute(sql, filters)
+
+    async def list_objects(
+            self,
+            limit: int = 10,
+            cursor: int | None = None
+    ) -> list[dict[str, Any]] | None:
+        raise NotImplementedError
