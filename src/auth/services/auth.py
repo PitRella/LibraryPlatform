@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.exceptions import RefreshTokenException, WrongCredentialsException
 from src.auth.repositories import AuthRepository
 from src.auth.schemas import CreateRefreshTokenSchema, TokenSchemas
-from src.auth.services import Hasher
+from src.auth.services.hasher import Hasher
 from src.auth.services.token import TokenManager
 from src.authors.repositories import AuthorRepository
 from src.base.repositories import BaseRepository
