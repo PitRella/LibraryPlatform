@@ -12,7 +12,7 @@ from src.authors.schemas import GetAuthorResponseSchema
 from src.base.dependencies import get_service
 from src.settings import Settings
 
-auth_router = APIRouter()
+auth_router = APIRouter(prefix='/auth', tags=['auth'])
 settings = Settings.load()
 
 

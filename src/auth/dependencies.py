@@ -9,7 +9,7 @@ from src.authors.service import AuthorService
 from src.base.dependencies import get_service
 
 oauth_scheme: OAuth2PasswordBearer = OAuth2PasswordBearer(
-    tokenUrl='/auth/login',
+    tokenUrl='/api/v1/auth/login',
 )
 
 
