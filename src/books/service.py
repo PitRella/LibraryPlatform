@@ -14,7 +14,7 @@ class BooksService(BaseService):
             db_session: AsyncSession,
             repo: BookRepository | None = None,
     ) -> None:
-        super().__init__(db_session,  repo or BookRepository(db_session))
+        super().__init__(db_session, repo or BookRepository(db_session))
 
     @staticmethod
     def _validate_author_permission(
@@ -72,5 +72,36 @@ class BooksService(BaseService):
         await self._repo.delete_object(id=book_id)
         return None
 
-    async def get_all_books(self, limit: int, cursor: int | None) -> list[dict[str, Any]] | None:
-        return await self._repo.list_objects(limit=limit, cursor=cursor)
+    async def get_all_books(
+            self,
+            limit: int,
+            cursor: int | None,
+            title: str | None = None,
+            genre: str | None = None,
+            language: str | None = None,
+            published_year: int | None = None,
+            author_id: int | None = None,
+    ) -> list[dict[str, Any]]:
+
+        filters = []
+        params: dict[str, Any] = {"limit": limit}
+
+        if cursor is not None:
+            filters.append("id > :cursor")
+            params["cursor"] = cursor
+        if title is not None:
+            filters.append("title = :title")
+            params["title"] = title
+        if genre is not None:
+            filters.append("genre = :genre")
+            params["genre"] = genre
+        if language is not None:
+            filters.append("language = :language")
+            params["language"] = language
+        if author_id is not None:
+            filters.append("author_id = :author_id")
+            params["author_id"] = author_id
+        if published_year is not None:
+            filters.append("published_year = :published_year")
+            params["published_year"] = published_year
+        return await self._repo.list_objects(filters, params)

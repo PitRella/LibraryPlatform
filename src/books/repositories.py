@@ -72,39 +72,24 @@ class BookRepository(ListableRepository):
             await self._session.execute(sql, filters)
 
     async def list_objects(
-            self,
-            limit: int = 10,
-            cursor: int | None = None
-    ) -> list[dict[str, Any]] | None:
-        if cursor:
-            sql = text("""
-                       SELECT id,
-                              title,
-                              genre,
-                              language,
-                              published_year,
-                              author_id,
-                              created_at
-                       FROM books
-                       WHERE id > :cursor
-                       ORDER BY id
-                       LIMIT :limit
-                       """)
-            params = {"cursor": cursor, "limit": limit}
-        else:
-            sql = text("""
-                       SELECT id,
-                              title,
-                              genre,
-                              language,
-                              published_year,
-                              author_id,
-                              created_at
-                       FROM books
-                       ORDER BY id
-                       LIMIT :limit
-                       """)
-            params = {"limit": limit}
+        self,
+        filters: list[str],
+        params: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        where_clause = " AND ".join(filters) if filters else "TRUE"
+        sql = text(f"""
+            SELECT id,
+                   title,
+                   genre,
+                   language,
+                   published_year,
+                   author_id,
+                   created_at
+            FROM books
+            WHERE {where_clause}
+            ORDER BY id
+            LIMIT :limit
+        """)
 
         result = await self._session.execute(sql, params)
         rows = result.mappings().all()

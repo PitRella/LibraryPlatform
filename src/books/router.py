@@ -15,8 +15,21 @@ async def get_all_books(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
         limit: int = Query(10, gt=0, le=100),
         cursor: int | None = Query(None),
+        title: str | None = None,
+        genre: str | None = None,
+        language: str | None = None,
+        published_year: int | None = None,
+        author_id: int | None = None,
 ) -> list[GetBookResponseSchema] | None:
-    books = await service.get_all_books(limit, cursor)
+    books = await service.get_all_books(
+        limit=limit,
+        cursor=cursor,
+        title=title,
+        genre=genre,
+        language = language,
+        published_year = published_year,
+        author_id = author_id,
+    )
     return [GetBookResponseSchema.model_validate(b) for b in books]
 
 

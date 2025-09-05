@@ -35,8 +35,8 @@ class BaseRepository(ABC):
 class ListableRepository(BaseRepository):
     @abstractmethod
     async def list_objects(
-            self,
-            limit: int = 10,
-            cursor: int | None = None
-    ) -> list[dict[str, Any]] | None:
+        self,
+        filters: list[str],
+        params: dict[str, Any],
+    ) -> list[dict[str, Any]]:
         pass
