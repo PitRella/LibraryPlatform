@@ -12,6 +12,6 @@ class TokenSchemas(BaseModel):
 
 
 class CreateRefreshTokenSchema(BaseSchema):
-    user_id: int
+    author_id: int
     refresh_token: uuid.UUID
     expires_in: float
