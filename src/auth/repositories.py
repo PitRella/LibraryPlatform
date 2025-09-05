@@ -44,7 +44,6 @@ class AuthRepository(BaseRepository):
     ) -> dict[str, Any] | None:
         set_expr = ", ".join(f"{k} = :set_{k}" for k in update_data.keys())
         conditions = " AND ".join(f"{k} = :{k}" for k in filters.keys())
-        returning = ", ".join(self.fields)
 
         params = {**{f"set_{k}": v for k, v in update_data.items()}, **filters}
 
@@ -52,7 +51,7 @@ class AuthRepository(BaseRepository):
             UPDATE refresh_tokens
             SET {set_expr}
             WHERE {conditions}
-            RETURNING {returning}
+            RETURNING *
         """)
         async with self._session.begin():
             result = await self._session.execute(sql, params)

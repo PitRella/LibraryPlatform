@@ -71,7 +71,7 @@ class AuthService(BaseService):
         updated_token = await self._repo.update_object(
             {"refresh_token": updated_refresh_token,
              "expires_in": tm_delta.total_seconds()},
-            id=refresh_token_model,
+            id=refresh_token_model['id'],
         )
         if not updated_token:
             raise RefreshTokenException
