@@ -1,8 +1,10 @@
-from typing import Annotated, Any, TypeVar
+from typing import Annotated, Any
+from datetime import datetime as dt
 
 from fastapi import Depends, Query, APIRouter, Path
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
+from src.books.enum import BookGenre, BookLanguage
 from src.books.schemas import CreateBookRequestSchema, GetBookResponseSchema, \
     UpdateBookRequestSchema, CreateBookResponseSchema
 from src.books.service import BooksService
@@ -15,20 +17,29 @@ async def get_all_books(
         service: Annotated[BooksService, Depends(get_service(BooksService))],
         limit: int = Query(10, gt=0, le=100),
         cursor: int | None = Query(None),
-        title: str | None = None,
-        genre: str | None = None,
-        language: str | None = None,
-        published_year: int | None = None,
-        author_id: int | None = None,
+        title: str | None = Query(
+            None,
+            min_length=1,
+            max_length=50,
+            pattern=r'^[a-zA-Z\s\-\'\.]+$'
+        ),
+        genre: BookGenre | None = None,
+        language: BookLanguage | None = None,
+        published_year: int | None = Query(
+            None,
+            ge=1800,
+            le=dt.now().year,
+        ),
+        author_id: int | None = Query(None, ge=0),
 ) -> list[GetBookResponseSchema] | None:
     books = await service.get_all_books(
         limit=limit,
         cursor=cursor,
         title=title,
         genre=genre,
-        language = language,
-        published_year = published_year,
-        author_id = author_id,
+        language=language,
+        published_year=published_year,
+        author_id=author_id,
     )
     return [GetBookResponseSchema.model_validate(b) for b in books]
 
