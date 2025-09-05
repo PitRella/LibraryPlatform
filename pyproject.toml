@@ -46,13 +46,6 @@ docstring-code-format = false # Do not format docstrings
 
 
 [tool.ruff.lint.per-file-ignores]
-"**" = [
-    "D203", # Blank line before class
-    "D213", # Multi-line docstring summary second line
-    "COM812", # Formatting conflict
-    "Q000", # flake8-quotes
-    "Q003", # flake8-quotes
-]
 
 "**/schemas/*.py" = [
     "N805" # Ignore first argument should be named self. Pydantic issue.
@@ -73,11 +66,6 @@ docstring-code-format = false # Do not format docstrings
     "S607", # partial executable paths
     "PT012", # simple statement in pytest.raises block
     "S106", # hardcoded assigned values
-    "D203", # blank line before class
-    "D213", # multi-line summary in docstring
-    "COM812", # comma formatting conflicts with formatter
-    "Q000", # quote style conflicts with formatter
-    "Q003", # mixed quotes conflicts with formatter
     "PLR2004" # magic value, for status codes
 ]
 
@@ -141,4 +129,13 @@ select = [
     "UP", # pyupgrade
     "W", # pycodestyle
     "YTT", # flake8-2020
+]
+
+# Игнорируем конфликтующие правила
+ignore = [
+    "D203", # incorrect-blank-line-before-class (конфликтует с D211)
+    "D213", # multi-line-summary-second-line (конфликтует с D212)
+    "COM812", # comma formatting conflicts with formatter
+    "Q000", # quote style conflicts with formatter
+    "Q003", # mixed quotes conflicts with formatter
 ]
