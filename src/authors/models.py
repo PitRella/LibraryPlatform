@@ -6,9 +6,25 @@ from src.books.models import Book
 
 
 class Author(PrimaryKeyMixin, TimeStampMixin):
-    """Author model for storing author information."""
+    """Author model for storing author information.
+
+    Inherits:
+        PrimaryKeyMixin: Adds auto-incrementing `id` primary key.
+        TimeStampMixin: Adds `created_at` and `updated_at` timestamps.
+
+    Attributes:
+        email (Mapped[str]): Unique email of the author.
+        password (Mapped[str]): Hashed password for authentication.
+        name (Mapped[str]): Unique name of the author.
+        biography (Mapped[str | None]): Optional biography text.
+        birth_year (Mapped[int | None]): Optional year of birth.
+        nationality (Mapped[str | None]): Optional nationality.
+        books (Mapped[list[Book]]): Relationship to books authored.
+
+    """
 
     __tablename__ = 'authors'
+
     email: Mapped[str] = mapped_column(
         String(255),
         nullable=False,

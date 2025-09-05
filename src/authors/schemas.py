@@ -13,6 +13,12 @@ PASSWORD_PATTERN = re.compile(
 
 
 class CreateAuthorRequestSchema(BaseSchema):
+    """Schema for creating a new author.
+
+    Validates email, password, name, and optional fields like biography,
+    birth year, and nationality.
+    """
+
     email: Annotated[
         EmailStr,
         Field(
@@ -29,7 +35,8 @@ class CreateAuthorRequestSchema(BaseSchema):
             min_length=8,
             max_length=128,
             example='Abc123@xyz',
-            description='Password must contain: lowercase, uppercase, digit, special character',
+            description='Password must contain: lowercase, uppercase, '
+            'digit, special character',
         ),
     ]
 
@@ -81,16 +88,45 @@ class CreateAuthorRequestSchema(BaseSchema):
 
     @field_validator('password')
     def validate_password(cls, value: str) -> str:
+        """Validate that the password meets complexity requirements.
+
+        Raises:
+            BadPasswordSchemaException: If password does not contain
+            at least one uppercase letter, one lowercase letter, one digit,
+            and one special character @$!%*?&.
+
+        Returns:
+            str: The validated password.
+
+        """
         if not PASSWORD_PATTERN.match(value):
             raise BadPasswordSchemaException()
         return value
 
 
 class CreateAuthorResponseSchema(BaseSchema):
+    """Response schema returned after creating a new author.
+
+    Attributes:
+        id (int): ID of the newly created author.
+
+    """
+
     id: int
 
 
 class GetAuthorResponseSchema(BaseModel):
+    """Schema for retrieving author details.
+
+    Attributes:
+        email (EmailStr): Author's email address.
+        name (str): Author's full name.
+        biography (str): Author's biography.
+        birth_year (int): Author's year of birth.
+        nationality (str): Author's nationality.
+
+    """
+
     email: EmailStr
     name: str
     biography: str
