@@ -1,3 +1,4 @@
+from datetime import UTC
 from datetime import datetime as dt
 from typing import Annotated, Any
 
@@ -41,20 +42,20 @@ async def get_all_books(
     published_year: int | None = Query(
         None,
         ge=1800,
-        le=dt.now().year,
+        le=dt.now(UTC).year,
         description='Filter by published year',
         examples=[1985, 2022],
     ),
     year_from: int | None = Query(
         None,
         ge=1800,
-        le=dt.now().year,
+        le=dt.now(UTC).year,
         description='Filter books published from this year (inclusive)',
     ),
     year_to: int | None = Query(
         None,
         ge=1800,
-        le=dt.now().year,
+        le=dt.now(UTC).year,
         description='Filter books published up to this year (inclusive)',
     ),
     author_id: int | None = Query(None, ge=0),
@@ -217,7 +218,7 @@ async def delete_book(
 async def import_books(
     author: Annotated[dict[str, Any], Depends(get_author_from_token)],
     service: Annotated[BooksService, Depends(get_service(BooksService))],
-    file: UploadFile = File(..., description='Books file (JSON or CSV)'),
+    file: Annotated[UploadFile, File(description='Books file (JSON or CSV)')],
 ) -> UploadedBooksResponseSchema:
     """Import multiple books from a file.
 

@@ -49,4 +49,7 @@ class Book(PrimaryKeyMixin, TimeStampMixin):
             str: Formatted string showing id, title, and author_id.
 
         """
-        return f'<Book(id={self.id}, title="{self.title}", author_id={self.author_id})>'
+        return (
+            f'<Book(id={self.id}, title="{self.title}",'
+            f' author_id={self.author_id})>'
+        )

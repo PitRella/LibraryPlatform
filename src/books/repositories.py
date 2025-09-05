@@ -63,7 +63,7 @@ class BookRepository(ListableRepository):
         conditions = ' AND '.join(f'{key} = :{key}' for key in filters)
 
         sql = text(f"""
-            SELECT id, title, genre, language, published_year, author_id, created_at
+            SELECT id,title,genre,language,published_year,author_id,created_at
             FROM books
             WHERE {conditions}
             LIMIT 1

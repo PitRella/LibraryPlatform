@@ -1,3 +1,4 @@
+from datetime import UTC
 from datetime import datetime as dt
 from typing import Annotated
 
@@ -36,7 +37,7 @@ class CreateBookRequestSchema(BaseSchema):
         int,
         Field(
             ge=1800,
-            le=dt.now().year,
+            le=dt.now(UTC).year,
             example=1985,
             description='Book published year',
         ),
@@ -86,7 +87,7 @@ class UpdateBookRequestSchema(BaseSchema):
         Field(
             default=None,
             ge=1800,
-            le=dt.now().year,
+            le=dt.now(UTC).year,
             example=1985,
             description='Book published year',
         ),

@@ -31,8 +31,8 @@ class GetBooksParamsResponseDTO(BaseDTO):
         language (BookLanguage | None): Filter by language.
         author_id (int | None): Filter by author ID.
         published_year (int | None): Filter by exact published year.
-        year_from (int | None): Filter books published from this year (inclusive).
-        year_to (int | None): Filter books published up to this year (inclusive).
+        year_from (int | None): Filter published from this year (inclusive).
+        year_to (int | None): Filter published up to this year (inclusive).
 
     """
 
