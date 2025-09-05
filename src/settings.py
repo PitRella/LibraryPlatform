@@ -36,6 +36,7 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        """Return the database URL."""
         return (
             f'postgresql+asyncpg://{self.USER}:{self.PASSWORD}'
             f'@{self.HOST}:{self.PORT}/{self.NAME}'
@@ -63,7 +64,7 @@ class Settings(BaseSettings):
     # Nested settings
     token_settings: TokenSettings = Field(default_factory=TokenSettings)
     database_settings: DatabaseSettings = Field(
-        default_factory=DatabaseSettings
+        default_factory=DatabaseSettings  # type: ignore
     )
     logging_settings: LoggingSettings = Field(default_factory=LoggingSettings)
 

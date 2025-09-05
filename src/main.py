@@ -14,8 +14,46 @@ logger = logging.getLogger(__name__)
 settings = Settings.load()
 configure_logging()
 
-app = FastAPI(title='LibraryPlatform')
-
+app = FastAPI(
+    title='Library Platform API',
+    description=(
+        'A comprehensive REST API for managing books and authors in a library system. '
+        'This API provides endpoints for author registration, authentication, book management, '
+        'and bulk import functionality. Built with FastAPI, SQLAlchemy, and PostgreSQL.'
+    ),
+    version='1.0.0',
+    contact={
+        'name': 'Serhii Kryvtsun',
+        'url': 'https://github.com/pitrella',
+    },
+    license_info={
+        'name': 'MIT License',
+        'url': 'https://opensource.org/licenses/MIT',
+    },
+    servers=[
+        {
+            'url': 'http://localhost:8000',
+            'description': 'Development server',
+        },
+    ],
+    openapi_tags=[
+        {
+            'name': 'auth',
+            'description': 'Authentication and authorization endpoints. '
+            'Handles user login, token refresh, and logout operations.',
+        },
+        {
+            'name': 'author',
+            'description': 'Author management endpoints. '
+            'Handles author registration and profile management.',
+        },
+        {
+            'name': 'books',
+            'description': 'Book management endpoints. '
+            'Handles CRUD operations for books, filtering, and bulk import.',
+        },
+    ],
+)
 app.add_middleware(GlobalExceptionMiddleware)
 
 main_api_router = APIRouter(prefix='/api/v1')
