@@ -4,15 +4,9 @@ from typing import Annotated
 
 from pydantic import Field, EmailStr, field_validator
 
-from src.authors.exceptions import BadPasswordSchemaException
 from src.base.schemas import BaseSchema
-from pydantic import BaseModel
 
 from src.books.enum import BookGenre, BookLanguage
-
-PASSWORD_PATTERN = re.compile(
-    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
-)
 
 
 class CreateBookRequestSchema(BaseSchema):
@@ -34,3 +28,10 @@ class CreateBookRequestSchema(BaseSchema):
         description="Book published year"
     )]
 
+
+class GetBookResponseSchema(BaseSchema):
+    id: int
+    title: str
+    genre: BookGenre
+    language: BookLanguage
+    published_year: int
