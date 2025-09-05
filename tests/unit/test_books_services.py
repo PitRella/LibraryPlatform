@@ -150,14 +150,19 @@ class TestBooksService:
         ]
         mock_repo.list_objects.return_value = mock_books
         
-        result = await books_service.get_all_books(
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
             limit=2,
             cursor=None,
-            title="Book",
-            genre=BookGenre.FICTION,
-            year_from=2020,
-            year_to=2021
+            filters=BookFiltersSchema(
+                title="Book",
+                genre=BookGenre.FICTION,
+                year_from=2020,
+                year_to=2021
+            )
         )
+        result = await books_service.get_all_books(params)
         
         assert result.items == mock_books[:2]  # Only first 2 items (limit=2)
         assert result.next_cursor == 2  # Next cursor is the last item's ID
@@ -181,7 +186,14 @@ class TestBooksService:
         mock_books = [{"id": i, "title": f"Book {i}"} for i in range(1, 12)]
         mock_repo.list_objects.return_value = mock_books
         
-        result = await books_service.get_all_books(limit=10, cursor=5)
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
+            limit=10,
+            cursor=5,
+            filters=BookFiltersSchema()
+        )
+        result = await books_service.get_all_books(params)
         
         assert len(result.items) == 10
         assert result.next_cursor == 10  # Last item's ID
@@ -257,7 +269,14 @@ class TestBooksService:
         """Test book listing with empty result."""
         mock_repo.list_objects.return_value = []
         
-        result = await books_service.get_all_books(limit=10, cursor=None)
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
+            limit=10,
+            cursor=None,
+            filters=BookFiltersSchema()
+        )
+        result = await books_service.get_all_books(params)
         
         assert result.items == []
         assert result.next_cursor is None
@@ -270,7 +289,14 @@ class TestBooksService:
         mock_books = [{"id": i, "title": f"Book {i}"} for i in range(1, 11)]
         mock_repo.list_objects.return_value = mock_books
         
-        result = await books_service.get_all_books(limit=10, cursor=None)
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
+            limit=10,
+            cursor=None,
+            filters=BookFiltersSchema()
+        )
+        result = await books_service.get_all_books(params)
         
         assert len(result.items) == 10
         assert result.next_cursor is None  # No more items
@@ -283,10 +309,17 @@ class TestBooksService:
         mock_books = [{"id": i, "title": f"Book {i}"} for i in range(3, 8)]
         mock_repo.list_objects.return_value = mock_books
         
-        result = await books_service.get_all_books(limit=5, cursor=2)
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
+            limit=5,
+            cursor=2,
+            filters=BookFiltersSchema()
+        )
+        result = await books_service.get_all_books(params)
         
         assert len(result.items) == 5
-        assert result.next_cursor == 7  # Last item's ID
+        assert result.next_cursor is None  # No more items (5 items = limit)
         assert result.items[0]["id"] == 3
         assert result.items[-1]["id"] == 7
     
@@ -299,15 +332,20 @@ class TestBooksService:
         ]
         mock_repo.list_objects.return_value = mock_books
         
-        result = await books_service.get_all_books(
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
             limit=5,
             cursor=None,
-            title="Book",
-            genre=BookGenre.FICTION,
-            language=BookLanguage.ENGLISH,
-            year_from=2019,
-            year_to=2022
+            filters=BookFiltersSchema(
+                title="Book",
+                genre=BookGenre.FICTION,
+                language=BookLanguage.ENGLISH,
+                year_from=2019,
+                year_to=2022
+            )
         )
+        result = await books_service.get_all_books(params)
         
         assert result.items == mock_books
         
@@ -334,7 +372,14 @@ class TestBooksService:
         mock_books = [{"id": i, "title": f"Book {i}"} for i in range(1, 6)]
         mock_repo.list_objects.return_value = mock_books
         
-        result = await books_service.get_all_books(limit=10, cursor=None)
+        from src.books.schemas import BookListParamsSchema, BookFiltersSchema
+        
+        params = BookListParamsSchema(
+            limit=10,
+            cursor=None,
+            filters=BookFiltersSchema()
+        )
+        result = await books_service.get_all_books(params)
         
         assert result.items == mock_books
         
@@ -342,4 +387,4 @@ class TestBooksService:
         call_args = mock_repo.list_objects.call_args
         filters = call_args[0][0]
         
-        assert filters == ""  # No filters applied
+        assert filters == []  # No filters applied
