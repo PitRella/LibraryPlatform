@@ -11,3 +11,6 @@ class AuthRepository(BaseRepository):
 
     async def create_object(self, params: dict[str, Any]) -> int:
         pass
+
+    async def get_object(self, params: dict[str, Any]) -> Any:
+        pass
