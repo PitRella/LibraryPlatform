@@ -1,4 +1,6 @@
 from datetime import datetime as dt, timezone
+
+from src.auth.services import Hasher
 from src.authors.repositories import AuthorRepository
 from src.authors.schemas import CreateAuthorRequestSchema
 from src.base.services import BaseService
@@ -17,7 +19,7 @@ class AuthorService(BaseService):
             author_schema: CreateAuthorRequestSchema
     ) -> int:
         author_data = author_schema.model_dump()
-        # user_data['password'] = # TODO: Add password hash
+        author_data['password'] = Hasher.hash_password(author_schema.password)
         author_data['created_at'] = dt.now(timezone.utc)
         author_id: int = await self._repo.create_object(author_data)
         return author_id
