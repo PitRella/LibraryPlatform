@@ -12,3 +12,10 @@ class BaseRepository:
 
     async def get_object(self, **filters: Any) -> dict[str, Any] | None:
         pass
+
+    async def update_refresh_token(
+            self,
+            token_id: int,
+            update_data: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        pass
