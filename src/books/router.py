@@ -1,7 +1,11 @@
+import csv
+import json
+from fastapi import HTTPException
+from io import StringIO
 from typing import Annotated, Any
 from datetime import datetime as dt
 
-from fastapi import Depends, Query, APIRouter, Path
+from fastapi import Depends, Query, APIRouter, Path, UploadFile, File
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
 from src.books.enum import BookGenre, BookLanguage
@@ -122,3 +126,50 @@ async def delete_book(
         book_id=book_id,
     )
     return None
+
+
+@books_router.post(
+    "/import",
+    summary="Bulk import books",
+    description="Upload a JSON or CSV file with books and import them into the system.",
+    status_code=201,
+)
+async def import_books(
+        author: Annotated[dict[str, Any], Depends(get_author_from_token)],
+        service: Annotated[BooksService, Depends(get_service(BooksService))],
+        file: UploadFile = File(..., description="Books file (JSON or CSV)"),
+) -> dict[str, Any]:
+    content = await file.read()
+    books_to_create = []
+    try:
+        if file.filename.endswith(".json"):
+            data = json.loads(content.decode("utf-8"))
+            if not isinstance(data, list):
+                raise ValueError("JSON file must contain an array of books")
+            books_to_create = data
+
+        elif file.filename.endswith(".csv"):
+            reader = csv.DictReader(StringIO(content.decode("utf-8")))
+            books_to_create = list(reader)
+
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Unsupported file format. Use .json or .csv"
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to parse file: {e}"
+        )
+
+    created_ids: list[int] = []
+    for book in books_to_create:
+        schema = CreateBookRequestSchema(**book)
+        book_id = await service.create_book(author, schema)
+        created_ids.append(book_id)
+
+    return {
+        "imported": len(created_ids),
+        "book_ids": created_ids
+    }
