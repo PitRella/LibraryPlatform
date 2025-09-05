@@ -9,4 +9,3 @@ class PrimaryKeyMixin(Base):
         primary_key=True,
         autoincrement=True,
     )
-

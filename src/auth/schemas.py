@@ -15,3 +15,7 @@ class CreateRefreshTokenSchema(BaseSchema):
     author_id: int
     refresh_token: uuid.UUID
     expires_in: float
+
+
+class RefreshTokenRequestSchema(BaseSchema):
+    refresh_token: str

@@ -5,6 +5,7 @@ from src.settings import Settings
 
 LOG_FORMAT_DEBUG = '%(levelname)s:     %(message)s : %(funcName)s'
 
+
 @cache
 def configure_logging() -> None:
     """Configure logging."""

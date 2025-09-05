@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 class AuthorException(HTTPException):
     """Base exception for author-related errors."""
-    pass
+
 
 class BadPasswordSchemaException(AuthorException):
     """Exception raised for invalid password format."""
@@ -17,8 +17,8 @@ class BadPasswordSchemaException(AuthorException):
             'character @$!%*?&.',
         )
 
-class AuthorNotFoundByIdException(AuthorException):
 
+class AuthorNotFoundByIdException(AuthorException):
     def __init__(self) -> None:
         super().__init__(
             status_code=404,
