@@ -4,7 +4,15 @@ This module provides a safe way to build dynamic SQL queries
 without risk of SQL injection attacks.
 """
 
-from typing import Any
+from typing import Any, ClassVar
+
+from src.base.exceptions import (
+    ColumnNotAllowedException,
+    NoFieldsForUpdateException,
+    OperatorNotAllowedException,
+    ParameterNotFoundException,
+    UnknownTableException,
+)
 
 
 class SecureQueryBuilder:
@@ -15,7 +23,7 @@ class SecureQueryBuilder:
     """
 
     # Whitelist of allowed column names for each table
-    ALLOWED_COLUMNS = {
+    ALLOWED_COLUMNS: ClassVar[dict[str, set[str]]] = {
         'books': {
             'id',
             'title',
@@ -45,7 +53,7 @@ class SecureQueryBuilder:
     }
 
     # Allowed operators for WHERE conditions
-    ALLOWED_OPERATORS = {
+    ALLOWED_OPERATORS: ClassVar[set[str]] = {
         '=',
         '!=',
         '<',
@@ -73,12 +81,10 @@ class SecureQueryBuilder:
 
         """
         if table_name not in cls.ALLOWED_COLUMNS:
-            raise ValueError(f'Unknown table: {table_name}')
+            raise UnknownTableException(table_name)
 
         if column_name not in cls.ALLOWED_COLUMNS[table_name]:
-            raise ValueError(
-                f"Column '{column_name}' not allowed for table '{table_name}'"
-            )
+            raise ColumnNotAllowedException(column_name, table_name)
 
         return column_name
 
@@ -97,7 +103,7 @@ class SecureQueryBuilder:
 
         """
         if operator.upper() not in cls.ALLOWED_OPERATORS:
-            raise ValueError(f"Operator '{operator}' not allowed")
+            raise OperatorNotAllowedException(operator)
 
         return operator.upper()
 
@@ -112,16 +118,22 @@ class SecureQueryBuilder:
 
         Args:
             table_name (str): Name of the database table.
-            conditions (List[Tuple[str, str, str]]): List of (column, operator, param_name) tuples.
+            conditions (List[Tuple[str, str, str]]): List of (column, operator,
+                param_name) tuples.
             params (Dict[str, Any]): Parameters dictionary.
 
         Returns:
             Tuple[str, Dict[str, Any]]: WHERE clause and updated parameters.
 
         Example:
-            conditions = [('title', '=', 'title_param'), ('genre', '=', 'genre_param')]
+            conditions = [
+                ('title', '=', 'title_param'),
+                ('genre', '=', 'genre_param')
+            ]
             params = {'title_param': 'Romeo', 'genre_param': 'FICTION'}
-            where_clause, params = builder.build_where_clause('books', conditions, params)
+            where_clause, params = builder.build_where_clause(
+                'books', conditions, params
+            )
             # Returns: ("title = :title_param AND genre = :genre_param", params)
 
         """
@@ -136,9 +148,7 @@ class SecureQueryBuilder:
 
             # Check that parameter exists
             if param_name not in params:
-                raise ValueError(
-                    f"Parameter '{param_name}' not found in params"
-                )
+                raise ParameterNotFoundException(param_name)
 
             validated_conditions.append(
                 f'{validated_column} {validated_operator} :{param_name}'
@@ -162,7 +172,7 @@ class SecureQueryBuilder:
 
         """
         if not update_fields:
-            raise ValueError('No fields provided for update')
+            raise NoFieldsForUpdateException
 
         validated_fields = []
         updated_params = {}
@@ -174,9 +184,7 @@ class SecureQueryBuilder:
             # Check that parameter exists with 'set_' prefix
             param_name = f'set_{field}'
             if param_name not in params:
-                raise ValueError(
-                    f"Parameter '{param_name}' not found in params"
-                )
+                raise ParameterNotFoundException(param_name)
 
             validated_fields.append(f'{validated_field} = :{param_name}')
             updated_params[param_name] = params[param_name]

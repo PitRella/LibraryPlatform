@@ -132,7 +132,8 @@ class AuthRepository(BaseRepository):
             'refresh_tokens', where_conditions, filters
         )
 
-        sql = text('DELETE FROM refresh_tokens WHERE ' + where_clause)
+        # where_clause is validated by SecureQueryBuilder, so this is safe
+        sql = text('DELETE FROM refresh_tokens WHERE ' + where_clause)  # noqa: S608
 
         async with self._session.begin():
             await self._session.execute(sql, safe_params)
