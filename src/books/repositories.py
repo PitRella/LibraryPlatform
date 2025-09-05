@@ -9,3 +9,16 @@ from src.base.repositories import BaseRepository
 class BookRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
+
+    async def create_object(self, params: dict[str, Any]) -> int:
+        sql = text(
+            """
+            INSERT INTO books (title, genre, language, published_year,
+                                 author_id, created_at)
+            VALUES (:title, :genre, :language, :published_year, :author_id, :created_at)
+            RETURNING id
+            """
+        )
+        async with self._session.begin():
+            result = await self._session.execute(sql, params)
+            return result.scalar_one()
