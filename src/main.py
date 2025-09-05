@@ -1,18 +1,22 @@
 import logging
 
 from fastapi import APIRouter, FastAPI
+from fastapi.responses import JSONResponse
 
 from src.auth.router import auth_router
 from src.books.router import books_router
 from src.logger import configure_logging
 from src.settings import Settings
 from src.authors.router import author_router
+from src.base.middleware import GlobalExceptionMiddleware
 logger = logging.getLogger(__name__)
 
 settings = Settings.load()
 configure_logging()
 
 app = FastAPI(title='LibraryPlatform')
+
+app.add_middleware(GlobalExceptionMiddleware)
 
 main_api_router = APIRouter(prefix='/api/v1')
 main_api_router.include_router(author_router)
