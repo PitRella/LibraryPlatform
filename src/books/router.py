@@ -72,8 +72,8 @@ async def get_all_books(
         year_to=year_to,
     )
     return GetBooksListResponseSchema(
-        items=[GetBookResponseSchema.model_validate(b) for b in books_result["items"]],
-        next_cursor=books_result["next_cursor"],
+        items=[GetBookResponseSchema.model_validate(b) for b in books_result.items],
+        next_cursor=books_result.next_cursor,
     )
 
 

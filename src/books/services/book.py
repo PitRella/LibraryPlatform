@@ -3,7 +3,8 @@ from datetime import datetime as dt, timezone
 from src.base.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.books.dto import ImportedBooksDTO, GetBooksParamsResponseDTO
+from src.books.dto import ImportedBooksDTO, GetBooksParamsResponseDTO, \
+    GetBooksResponseDTO
 from src.books.enum import BookLanguage, BookGenre
 from src.books.exceptions import BookPermissionException, BookNotFoundException
 from src.books.repositories import BookRepository
@@ -95,7 +96,7 @@ class BooksService(BaseService):
             author_id: int | None = None,
             year_from: int | None = None,
             year_to: int | None = None,
-    ) -> dict[str, Any]:
+    ) -> GetBooksResponseDTO:
         filters: list[str] = []
         params_d = GetBooksParamsResponseDTO(limit=limit + 1)
         if cursor is not None:
@@ -125,7 +126,7 @@ class BooksService(BaseService):
         rows = await self._repo.list_objects(filters, params_d.to_dict())
         items = rows[:limit]
         next_cursor = items[-1]['id'] if len(rows) > limit else None
-        return {"items": items, "next_cursor": next_cursor}
+        return GetBooksResponseDTO(items=items, next_cursor=next_cursor)
 
     async def import_books(
             self,

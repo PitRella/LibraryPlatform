@@ -22,3 +22,7 @@ class GetBooksParamsResponseDTO(BaseDTO):
     published_year: int | None = None
     year_from: int | None = None
     year_to: int | None = None
+@dataclass
+class GetBooksResponseDTO(BaseDTO):
+    items: list[dict[str, Any]]
+    next_cursor: int | None
