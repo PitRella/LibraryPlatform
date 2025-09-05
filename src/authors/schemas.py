@@ -88,7 +88,7 @@ class CreateAuthorRequestSchema(BaseSchema):
     ]
 
     @field_validator('password')
-    def validate_password(self, value: str) -> str:
+    def validate_password(cls, value: str) -> str:
         """Validate that the password meets complexity requirements.
 
         Raises:
