@@ -25,3 +25,7 @@ class BooksService(BaseService):
         book_data['created_at'] = dt.now(timezone.utc)
         book_id: int = await self._repo.create_object(book_data)
         return book_id
+
+    async def get_book(self, book_id: int):
+        return await self._repo.get_object(id=book_id)
+
