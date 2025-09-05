@@ -20,11 +20,12 @@ class AuthService(BaseService):
         self._author_repo = author_repo or AuthorRepository(db_session)
 
     @staticmethod
-    def _verify_user_password(author: Author | None, password: str) -> None:
-        if not author or not Hasher.verify_password(password, author.password):
+    def _verify_user_password(author_password: str, password: str) -> None:
+        if not author_password or not Hasher.verify_password(password, author_password):
             raise WrongCredentialsException
 
     async def auth_user(self, email: str, password: str) -> Author:
-        author: Author | None = await self._author_repo.get_object(email=email)
-        self._verify_user_password(author, password)
-        return author
+        author_data = await self._author_repo.get_object(email=email)
+        author_password = author_data.get('password')
+        self._verify_user_password(author_password, password)
+        return author_data
