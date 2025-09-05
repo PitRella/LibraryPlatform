@@ -23,3 +23,18 @@ class AuthorRepository(BaseRepository):
         async with self._session.begin():
             result = await self._session.execute(sql, params)
             return result.scalar_one()
+
+    async def get_object(self, **filters: Any) -> dict[str, Any] | None:
+        conditions = " AND ".join(f"{key} = :{key}" for key in filters.keys())
+
+        sql = text(f"""
+            SELECT id, email, name, biography, birth_year, nationality, created_at
+            FROM authors
+            WHERE {conditions}
+            LIMIT 1
+        """)
+
+        async with self._session.begin():
+            result = await self._session.execute(sql, filters)
+            row = result.mappings().first()
+            return dict(row) if row else None
