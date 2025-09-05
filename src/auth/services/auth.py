@@ -1,8 +1,10 @@
+import uuid
 from typing import Any
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from src.auth.exceptions import WrongCredentialsException
+from src.auth.exceptions import WrongCredentialsException, \
+    RefreshTokenException
 from src.auth.repositories import AuthRepository
 from src.auth.schemas import TokenSchemas, CreateRefreshTokenSchema
 from src.auth.services import Hasher
@@ -49,3 +51,32 @@ class AuthService(BaseService):
             access_token=access_token,
             refresh_token=str(refresh_token),
         )
+    async def refresh_token(self, refresh_token: uuid.UUID) -> TokenSchemas:
+        refresh_token_model = await self._repo.get_object(refresh_token=refresh_token)
+        if not refresh_token_model:
+            raise RefreshTokenException
+        TokenManager.validate_refresh_token_expired(
+            refresh_token_model=refresh_token_model,
+        )
+        author_id: int = refresh_token_model['author_id']
+        author = await self._author_repo.get_object(id=author_id)
+        if not author:
+            raise RefreshTokenException
+        access_token: str = TokenManager.generate_access_token(
+            author_id=author_id,
+        )
+        updated_refresh_token, tm_delta = (
+            TokenManager.generate_refresh_token()
+        )
+        updated_token = await self._repo.update_object(
+            {"refresh_token": updated_refresh_token,
+             "expires_in": tm_delta.total_seconds()},
+            id=refresh_token_model,
+        )
+        if not updated_token:
+            raise RefreshTokenException
+        return TokenSchemas(
+            access_token=access_token,
+            refresh_token=str(updated_refresh_token),
+        )
+

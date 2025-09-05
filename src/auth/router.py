@@ -1,7 +1,8 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response
-
+from fastapi.requests import Request
 from fastapi.security import OAuth2PasswordRequestForm
 from src.auth.schemas import TokenSchemas
 from src.auth.services.auth import AuthService
@@ -40,3 +41,29 @@ async def login_user(
     )
     return token
 
+
+@auth_router.post(path='/refresh', response_model=TokenSchemas)
+async def refresh_token(
+    request: Request,
+    response: Response,
+    service: Annotated[AuthService, Depends(get_service(AuthService))],
+) -> TokenSchemas:
+    token: TokenSchemas = await service.refresh_token(
+        refresh_token=uuid.UUID(request.cookies.get('refresh_token')),
+    )
+    response.set_cookie(
+        'access_token',
+        token.access_token,
+        max_age=settings.token_settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=True,
+    )
+    response.set_cookie(
+        'refresh_token',
+        token.refresh_token,
+        max_age=settings.token_settings.REFRESH_TOKEN_EXPIRE_DAYS
+        * 30
+        * 24
+        * 60,
+        httponly=True,
+    )
+    return token

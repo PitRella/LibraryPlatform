@@ -36,3 +36,25 @@ class AuthRepository(BaseRepository):
             result = await self._session.execute(sql, filters)
             row = result.mappings().first()
             return dict(row) if row else None
+
+    async def update_object(
+        self,
+        update_data: dict[str, Any],
+        **filters: Any,
+    ) -> dict[str, Any] | None:
+        set_expr = ", ".join(f"{k} = :set_{k}" for k in update_data.keys())
+        conditions = " AND ".join(f"{k} = :{k}" for k in filters.keys())
+        returning = ", ".join(self.fields)
+
+        params = {**{f"set_{k}": v for k, v in update_data.items()}, **filters}
+
+        sql = text(f"""
+            UPDATE refresh_tokens
+            SET {set_expr}
+            WHERE {conditions}
+            RETURNING {returning}
+        """)
+        async with self._session.begin():
+            result = await self._session.execute(sql, params)
+            row = result.mappings().first()
+            return dict(row) if row else None
