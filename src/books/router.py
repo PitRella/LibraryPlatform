@@ -1,13 +1,12 @@
-from datetime import UTC
-from datetime import datetime as dt
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
 
 from src.auth.dependencies import get_author_from_token
 from src.base.dependencies import get_service
-from src.books.enum import BookGenre, BookLanguage
 from src.books.schemas import (
+    BookFiltersSchema,
+    BookListParamsSchema,
     CreateBookRequestSchema,
     CreateBookResponseSchema,
     GetBookResponseSchema,
@@ -27,38 +26,9 @@ books_router = APIRouter(prefix='/books', tags=['books'])
 )
 async def get_all_books(
     service: Annotated[BooksService, Depends(get_service(BooksService))],
+    filters: Annotated[BookFiltersSchema, Depends()],
     limit: int = Query(10, gt=0, le=100, description='Maximum number of books'),
     cursor: int | None = Query(None, description='Cursor for pagination'),
-    title: str | None = Query(
-        None,
-        min_length=1,
-        max_length=50,
-        pattern=r'^[a-zA-Z\s\-\'\.]+$',
-        description='Filter by book title',
-        examples=['Romeo and Juliet', 'The Shining'],
-    ),
-    genre: BookGenre | None = None,
-    language: BookLanguage | None = None,
-    published_year: int | None = Query(
-        None,
-        ge=1800,
-        le=dt.now(UTC).year,
-        description='Filter by published year',
-        examples=[1985, 2022],
-    ),
-    year_from: int | None = Query(
-        None,
-        ge=1800,
-        le=dt.now(UTC).year,
-        description='Filter books published from this year (inclusive)',
-    ),
-    year_to: int | None = Query(
-        None,
-        ge=1800,
-        le=dt.now(UTC).year,
-        description='Filter books published up to this year (inclusive)',
-    ),
-    author_id: int | None = Query(None, ge=0),
 ) -> GetBooksListResponseSchema:
     """Retrieve all books matching given filters with pagination.
 
@@ -66,29 +36,18 @@ async def get_all_books(
         service (BooksService): Service dependency for book operations.
         limit (int): Max number of books to return.
         cursor (int | None): Pagination cursor.
-        title (str | None): Filter by book title.
-        genre (BookGenre | None): Filter by genre.
-        language (BookLanguage | None): Filter by language.
-        published_year (int | None): Filter by exact published year.
-        year_from (int | None): Filter books published from this year.
-        year_to (int | None): Filter books published up to this year.
-        author_id (int | None): Filter by author ID.
+        filters (BookFiltersSchema): Filters for books.
 
     Returns:
         GetBooksListResponseSchema: List of books and next cursor.
 
     """
-    books_result = await service.get_all_books(
+    params = BookListParamsSchema(
         limit=limit,
         cursor=cursor,
-        title=title,
-        genre=genre,
-        language=language,
-        published_year=published_year,
-        author_id=author_id,
-        year_from=year_from,
-        year_to=year_to,
+        filters=filters,
     )
+    books_result = await service.get_all_books(params)
     return GetBooksListResponseSchema(
         items=[
             GetBookResponseSchema.model_validate(b) for b in books_result.items

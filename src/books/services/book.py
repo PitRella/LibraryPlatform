@@ -11,10 +11,13 @@ from src.books.dto import (
     GetBooksResponseDTO,
     ImportedBooksDTO,
 )
-from src.books.enum import BookGenre, BookLanguage
 from src.books.exceptions import BookNotFoundException, BookPermissionException
 from src.books.repositories import BookRepository
-from src.books.schemas import CreateBookRequestSchema, UpdateBookRequestSchema
+from src.books.schemas import (
+    BookListParamsSchema,
+    CreateBookRequestSchema,
+    UpdateBookRequestSchema,
+)
 from src.books.services.importers import BookImporterFactory
 
 
@@ -175,64 +178,48 @@ class BooksService(BaseService):
 
     async def get_all_books(
         self,
-        limit: int,
-        cursor: int | None,
-        title: str | None = None,
-        genre: str | None = None,
-        language: str | None = None,
-        published_year: int | None = None,
-        author_id: int | None = None,
-        year_from: int | None = None,
-        year_to: int | None = None,
+        params: BookListParamsSchema,
     ) -> GetBooksResponseDTO:
         """List books with optional filters and pagination.
 
         Supports filtering by title, genre, language, author, and year.
 
         Args:
-            limit (int): Maximum number of books to return.
-            cursor (int | None): Cursor for pagination.
-            title (str | None): Filter by book title.
-            genre (str | None): Filter by book genre.
-            language (str | None): Filter by book language.
-            published_year (int | None): Filter by publication year.
-            author_id (int | None): Filter by author ID.
-            year_from (int | None): Filter books published from this year.
-            year_to (int | None): Filter books published up to this year.
+            params (BookListParamsSchema): Parameters for listing books.
 
         Returns:
             GetBooksResponseDTO: Paginated books and next cursor.
 
         """
         filters: list[str] = []
-        params_d = GetBooksParamsResponseDTO(limit=limit + 1)
-        if cursor is not None:
+        params_d = GetBooksParamsResponseDTO(limit=params.limit + 1)
+        if params.cursor is not None:
             filters.append('id > :cursor')
-            params_d.cursor = cursor
-        if title is not None:
+            params_d.cursor = params.cursor
+        if params.filters.title is not None:
             filters.append('title = :title')
-            params_d.title = title
-        if genre is not None:
+            params_d.title = params.filters.title
+        if params.filters.genre is not None:
             filters.append('genre = :genre')
-            params_d.genre = BookGenre(genre)
-        if language is not None:
+            params_d.genre = params.filters.genre
+        if params.filters.language is not None:
             filters.append('language = :language')
-            params_d.language = BookLanguage(language)
-        if author_id is not None:
+            params_d.language = params.filters.language
+        if params.filters.author_id is not None:
             filters.append('author_id = :author_id')
-            params_d.author_id = author_id
-        if published_year is not None:
+            params_d.author_id = params.filters.author_id
+        if params.filters.published_year is not None:
             filters.append('published_year = :published_year')
-            params_d.published_year = published_year
-        if year_from is not None:
+            params_d.published_year = params.filters.published_year
+        if params.filters.year_from is not None:
             filters.append('published_year >= :year_from')
-            params_d.year_from = year_from
-        if year_to is not None:
+            params_d.year_from = params.filters.year_from
+        if params.filters.year_to is not None:
             filters.append('published_year <= :year_to')
-            params_d.year_to = year_to
+            params_d.year_to = params.filters.year_to
         rows = await self._repo.list_objects(filters, params_d.to_dict())  # type: ignore
-        items = rows[:limit]
-        next_cursor = items[-1]['id'] if len(rows) > limit else None
+        items = rows[: params.limit]
+        next_cursor = items[-1]['id'] if len(rows) > params.limit else None
         return GetBooksResponseDTO(items=items, next_cursor=next_cursor)
 
     async def import_books(

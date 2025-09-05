@@ -126,6 +126,83 @@ class UploadedBooksResponseSchema(BaseSchema):
     book_ids: list[int]
 
 
+class BookFiltersSchema(BaseSchema):
+    """Schema for filtering books.
+
+    Attributes:
+        title (str | None): Filter by book title.
+        genre (BookGenre | None): Filter by genre.
+        language (BookLanguage | None): Filter by language.
+        published_year (int | None): Filter by exact published year.
+        year_from (int | None): Filter books published from this year.
+        year_to (int | None): Filter books published up to this year.
+        author_id (int | None): Filter by author ID.
+
+    """
+
+    title: Annotated[
+        str | None,
+        Field(
+            default=None,
+            min_length=1,
+            max_length=50,
+            pattern=r'^[a-zA-Z\s\-\'\.]+$',
+            description='Filter by book title',
+            examples=['Romeo and Juliet', 'The Shining'],
+        ),
+    ] = None
+    genre: BookGenre | None = None
+    language: BookLanguage | None = None
+    published_year: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=1800,
+            le=dt.now(UTC).year,
+            description='Filter by published year',
+            examples=[1985, 2022],
+        ),
+    ] = None
+    year_from: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=1800,
+            le=dt.now(UTC).year,
+            description='Filter books published from this year (inclusive)',
+        ),
+    ] = None
+    year_to: Annotated[
+        int | None,
+        Field(
+            default=None,
+            ge=1800,
+            le=dt.now(UTC).year,
+            description='Filter books published up to this year (inclusive)',
+        ),
+    ] = None
+    author_id: Annotated[
+        int | None, Field(default=None, ge=0, description='Filter by author ID')
+    ] = None
+
+
+class BookListParamsSchema(BaseSchema):
+    """Schema for book list parameters.
+
+    Attributes:
+        limit (int): Maximum number of books to return.
+        cursor (int | None): Cursor for pagination.
+        filters (BookFiltersSchema): Filters for books.
+
+    """
+
+    limit: Annotated[
+        int, Field(gt=0, le=100, description='Maximum number of books')
+    ]
+    cursor: int | None = None
+    filters: BookFiltersSchema
+
+
 class GetBooksListResponseSchema(BaseSchema):
     """Schema for paginated list of books.
 
