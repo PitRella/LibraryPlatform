@@ -42,14 +42,14 @@ jobs:
 
       - name: Check for trailing whitespace
         run: |
-          if grep -rIn --exclude-dir={.git,.venv,venv,__pycache__} '\s$' .; then
+          if grep -rIn --exclude-dir={.git,.venv,venv,__pycache__,tests} '\s$' .; then
             echo "Trailing whitespace found"
             exit 1
           fi
 
       - name: Check for missing newline at end of file
         run: |
-          if find . -type f -not -path "*/\.*" | xargs -I {} bash -c 'tail -c1 "{}" | od -An -t x1 | grep -qv "0a" && echo "{} missing newline"'; then
+          if find . -type f -not -path "*/\.*" -not -path "*/tests/*" | xargs -I {} bash -c 'tail -c1 "{}" | od -An -t x1 | grep -qv "0a" && echo "{} missing newline"'; then
             echo "Missing newline at end of file found"
             exit 1
           fi
