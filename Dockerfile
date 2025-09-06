@@ -4,6 +4,7 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml uv.lock ./
@@ -21,7 +22,7 @@ USER app
 
 EXPOSE 8000
 
-# Создаем скрипт запуска
+# Create startup script
 RUN echo '#!/bin/bash\nuv run uvicorn src.main:app --host ${APP_HOST:-0.0.0.0} --port ${APP_PORT:-8000} --reload' > /app/start.sh && \
     chmod +x /app/start.sh
 
