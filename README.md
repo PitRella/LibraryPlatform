@@ -5,20 +5,24 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17+-blue.svg)](https://postgresql.org)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://docker.com)
 [![Code Style](https://img.shields.io/badge/Code%20Style-Google%20%7C%20Make%20Python-orange.svg)](https://google.github.io/styleguide/pyguide.html)
+[![CI](https://github.com/PitRella/LibraryPlatform/workflows/Code%20Quality/badge.svg)](https://github.com/PitRella/LibraryPlatform/actions)
 
 A modern, scalable REST API for managing books and authors in a library system. Built with FastAPI, SQLAlchemy, and PostgreSQL, featuring comprehensive authentication, book management, and bulk import capabilities.
 
 ## ✨ Features
 
 - 🔐 **JWT Authentication** - Secure token-based authentication with refresh tokens
-- 👤 **Author Management** - Complete CRUD operations for authors
-- 📖 **Book Management** - Advanced book catalog with filtering and search
+- 👤 **Author Management** - Author registration and profile management
+- 📖 **Book Management** - Advanced book catalog with filtering and pagination
 - 📥 **Bulk Import** - Import books from CSV and JSON files
 - 🐳 **Docker Ready** - Full containerization with Docker Compose
 - 🗄️ **Database Migrations** - Automated schema management with Alembic
 - 📊 **API Documentation** - Interactive Swagger/OpenAPI documentation
 - 🧪 **Comprehensive Testing** - Unit and integration tests
 - 🔍 **Code Quality** - Following Google Python Style Guide and Make Python Style Guide
+- ⚡ **High Performance** - Async/await support with SQLAlchemy 2.0
+- 📝 **Conventional Commits** - Standardized commit message format
+- 🤖 **GitHub Actions** - Automated CI/CD pipeline with quality checks
 
 ## 🏗️ Architecture
 
@@ -37,9 +41,16 @@ src/
 
 ### Prerequisites
 
-- Docker and Docker Compose
-- Python 3.13+ (for local development)
-- UV package manager (recommended)
+- **Docker** 20.10+ and **Docker Compose** 2.0+
+- **Python** 3.13+ (for local development)
+- **UV** package manager (recommended)
+- **Git** 2.0+ (for version control)
+
+### System Requirements
+
+- **RAM**: 2GB minimum, 4GB recommended
+- **Storage**: 1GB free space
+- **OS**: Linux, macOS, or Windows with WSL2
 
 ### 1. Clone the Repository
 
@@ -179,6 +190,7 @@ This project follows strict code quality standards:
 
 - **Google Python Style Guide** - For consistent, readable code
 - **Make Python Style Guide** - For additional best practices
+- **Conventional Commits** - Standardized commit message format
 - **Ruff** - Fast Python linter and formatter
 - **MyPy** - Static type checking
 - **Pre-commit hooks** - Automated code quality checks
@@ -197,9 +209,46 @@ uv run mypy src/
 
 # Run all checks
 uv run pre-commit run --all-files
+
+# Check commit message format (if commitlint is configured)
+npx commitlint --from HEAD~1 --to HEAD --verbose
+```
+
+### GitHub Actions
+
+This project uses GitHub Actions for automated quality checks on every pull request and push to main/develop branches.
+
+#### Automated Checks
+
+The CI pipeline runs the following checks:
+
+- **Code Linting** - Ruff linter for code quality
+- **Code Formatting** - Ruff formatter for consistent style
+- **Type Checking** - MyPy for static type analysis
+- **YAML Validation** - Syntax validation for YAML files
+- **Whitespace Checks** - Trailing whitespace and missing newlines
+- **Debug Statement Detection** - Prevents debug code in production
+
+#### Workflow Triggers
+
+- **Pull Requests** - Runs on PRs to `main` and `develop` branches
+- **Push Events** - Runs on direct pushes to `main` and `develop` branches
+
+#### Status Badge
+
+You can add a status badge to your README:
+
+```markdown
+[![CI](https://github.com/PitRella/LibraryPlatform/workflows/Code%20Quality/badge.svg)](https://github.com/PitRella/LibraryPlatform/actions)
 ```
 
 ### Testing
+
+This project includes comprehensive testing with multiple test types:
+
+- **Unit Tests** - Test individual components in isolation
+- **Integration Tests** - Test API endpoints and database interactions
+- **Test Coverage** - Aim for high code coverage
 
 Run the test suite:
 
@@ -210,8 +259,18 @@ uv run pytest
 # Run with coverage
 uv run pytest --cov=src
 
+# Run specific test types
+uv run pytest -m unit          # Unit tests only
+uv run pytest -m integration   # Integration tests only
+
 # Run specific test file
 uv run pytest tests/unit/test_auth_services.py
+
+# Run tests with verbose output
+uv run pytest -v
+
+# Run tests in parallel (faster)
+uv run pytest -n auto
 ```
 
 ## 📊 API Endpoints
@@ -221,21 +280,18 @@ uv run pytest tests/unit/test_auth_services.py
 - `POST /api/v1/auth/login` - Login and get tokens
 - `POST /api/v1/auth/refresh` - Refresh access token
 - `POST /api/v1/auth/logout` - Logout and invalidate tokens
+- `GET /api/v1/auth/me` - Get current user profile (requires authentication)
 
 ### Authors
-- `GET /api/v1/authors/` - List all authors
-- `POST /api/v1/authors/` - Create new author
-- `GET /api/v1/authors/{id}` - Get author by ID
-- `PUT /api/v1/authors/{id}` - Update author
-- `DELETE /api/v1/authors/{id}` - Delete author
+- `POST /api/v1/author/` - Create new author
 
 ### Books
-- `GET /api/v1/books/` - List books with filtering
-- `POST /api/v1/books/` - Create new book
+- `GET /api/v1/books/all` - List books with filtering and pagination
+- `POST /api/v1/books/` - Create new book (requires authentication)
 - `GET /api/v1/books/{id}` - Get book by ID
-- `PUT /api/v1/books/{id}` - Update book
-- `DELETE /api/v1/books/{id}` - Delete book
-- `POST /api/v1/books/import` - Bulk import books
+- `PATCH /api/v1/books/{id}` - Update book (requires authentication)
+- `DELETE /api/v1/books/{id}` - Delete book (requires authentication)
+- `POST /api/v1/books/import` - Bulk import books from CSV/JSON (requires authentication)
 
 ### System
 - `GET /health` - Health check endpoint
@@ -320,26 +376,128 @@ LibraryPlatform/
 └── README.md             # This file
 ```
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Docker containers won't start:**
+```bash
+# Check if ports are available
+netstat -tulpn | grep :8000
+netstat -tulpn | grep :5432
+
+# Clean up and restart
+docker-compose down -v
+docker-compose up --build -d
+```
+
+**Database connection issues:**
+```bash
+# Check database logs
+docker-compose logs library_database
+
+# Test database connection
+docker-compose exec library_database psql -U postgres -d library_database -c "SELECT 1;"
+```
+
+**Migration errors:**
+```bash
+# Check migration status
+./scripts/migrate.sh current
+
+# Reset migrations (⚠️ Data loss!)
+docker-compose down -v
+docker-compose up -d
+```
+
+**Pre-commit hooks failing:**
+```bash
+# Run hooks manually
+uv run pre-commit run --all-files
+
+# Skip hooks for emergency commit
+git commit --no-verify -m "Emergency fix"
+```
+
 ## 🤝 Contributing
+
+### Development Workflow
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Follow the code style guidelines (Google Python Style Guide + Make Python Style Guide)
 4. Write tests for your changes
 5. Run the quality checks (`uv run pre-commit run --all-files`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Commit your changes using Conventional Commits format
 7. Push to the branch (`git push origin feature/amazing-feature`)
 8. Open a Pull Request
 
+### Conventional Commits
+
+This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification for commit messages. This ensures a clean, readable git history and enables automated changelog generation.
+
+#### Commit Message Format
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### Types
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools
+- **ci**: Changes to CI configuration files and scripts
+- **build**: Changes that affect the build system or external dependencies
+
+#### Examples
+
+```bash
+# Feature
+git commit -m "feat(auth): add JWT token refresh endpoint"
+
+# Bug fix
+git commit -m "fix(books): resolve pagination issue in book listing"
+
+# Documentation
+git commit -m "docs: update API documentation for new endpoints"
+
+# Breaking change
+git commit -m "feat(api)!: change response format for book creation
+
+BREAKING CHANGE: book creation now returns book ID instead of full object"
+
+# Multiple commits
+git commit -m "feat(authors): add author validation"
+git commit -m "test(authors): add unit tests for author validation"
+git commit -m "docs(authors): update author API documentation"
+```
+
+#### Scope Guidelines
+
+- Use the module name (auth, authors, books, etc.)
+- Use lowercase
+- Be specific but concise
+- Examples: `auth`, `books`, `database`, `docker`, `tests`
+
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
 **Serhii Kryvtsun**
 - GitHub: [@pitrella](https://github.com/pitrella)
-- Telegram: [@pitrella]
+- Telegram: [@pitrella](https://t.me/pitrella)
 
 ## 🙏 Acknowledgments
 
@@ -348,6 +506,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Alembic](https://alembic.sqlalchemy.org/) - Database migration tool
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html) - Code style guidelines
 - [Make Python Style Guide](https://make.readthedocs.io/en/latest/python-style-guide.html) - Additional best practices
+- [Conventional Commits](https://www.conventionalcommits.org/) - Commit message specification
+- [GitHub Actions](https://github.com/features/actions) - CI/CD automation platform
 
 ---
 
