@@ -234,13 +234,6 @@ The CI pipeline runs the following checks:
 - **Pull Requests** - Runs on PRs to `main` and `develop` branches
 - **Push Events** - Runs on direct pushes to `main` and `develop` branches
 
-#### Status Badge
-
-You can add a status badge to your README:
-
-```markdown
-[![CI](https://github.com/PitRella/LibraryPlatform/workflows/Code%20Quality/badge.svg)](https://github.com/PitRella/LibraryPlatform/actions)
-```
 
 ### Testing
 
