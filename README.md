@@ -44,7 +44,7 @@ src/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/LibraryPlatform.git
+git clone https://github.com/PitRella/LibraryPlatform
 cd LibraryPlatform
 ```
 
@@ -339,7 +339,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Serhii Kryvtsun**
 - GitHub: [@pitrella](https://github.com/pitrella)
-- Email: [your-email@example.com]
+- Telegram: [@pitrella]
 
 ## 🙏 Acknowledgments
 
