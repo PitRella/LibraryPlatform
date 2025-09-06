@@ -4,15 +4,71 @@ services:
     image: postgres:17.5-alpine
     restart: always
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-library_database}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - container
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-library_database}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  library_migrations:
+    container_name: "library_migrations"
+    build: .
+    environment:
+      - DB_HOST=library_database
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-library_database}
+    command: ["uv", "run", "alembic", "upgrade", "head"]
+    depends_on:
+      library_database:
+        condition: service_healthy
+    networks:
+      - container
+
+  library_api:
+    container_name: "library_api"
+    build: .
+    restart: always
+    environment:
+      - APP_NAME=${APP_NAME:-LibraryPlatform}
+      - APP_HOST=${APP_HOST:-0.0.0.0}
+      - APP_PORT=${APP_PORT:-8000}
+      - APP_RELOAD=${APP_RELOAD:-True}
+      - APP_MODE=${APP_MODE:-dev}
+      - DB_HOST=library_database
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-library_database}
+      - TOKEN_SECRET_KEY=${TOKEN_SECRET_KEY}
+      - TOKEN_ALGORITHM=${TOKEN_ALGORITHM:-HS256}
+      - TOKEN_ACCESS_TOKEN_EXPIRE_MINUTES=${TOKEN_ACCESS_TOKEN_EXPIRE_MINUTES:-15}
+      - TOKEN_REFRESH_TOKEN_EXPIRE_DAYS=${TOKEN_REFRESH_TOKEN_EXPIRE_DAYS:-30}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      library_database:
+        condition: service_healthy
+      library_migrations:
+        condition: service_completed_successfully
+    networks:
+      - container
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 
 volumes:

@@ -21,7 +21,7 @@ dependencies = [
 
 [tool.mypy]
 plugins = ["sqlalchemy.ext.mypy.plugin"]
-exclude = "grafana_storage/|migrations/|tests/|docs/"
+exclude = "grafana_storage/|migrations/|tests/|docs/|src/tests/|tests/"
 strict = true
 local_partial_types = true
 warn_unreachable = true
@@ -36,7 +36,8 @@ exclude = [
     ".qodo",
     "build",
     "dist",
-    "tests/fixtures",
+    "tests",
+    "src/tests",
     "__pycache__",
 ]
 
@@ -53,20 +54,8 @@ docstring-code-format = false # Do not format docstrings
 "schemas/*.py" = [
     "N805" # Ignore first argument should be named self. Pydantic issue.
 ]
-"tests/*.py" = [
-    "S101", # asserts
-    "D100", # Docstring in a public module
-    "D101", # Docstring in a public class
-    "D102", # Docstring in a public method
-    "D103", # Docstring in a public method
-    "D104", # Docstring in a public function
-    "S105", # hardcoded passwords
-    "S404", # subprocess calls are for tests
-    "S603", # do not require `shell=True`
-    "S607", # partial executable paths
-    "PT012", # simple statement in pytest.raises block
-    "S106", # hardcoded assigned values
-    "PLR2004" # magic value, for status codes
+"src/authors/schemas.py" = [
+    "N805" # Ignore first argument should be named self. Pydantic validator issue.
 ]
 
 "src/*.py" = [

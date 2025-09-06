@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, FastAPI
+from fastapi.responses import JSONResponse
 
 from src.auth.router import auth_router
 from src.authors.router import author_router
@@ -17,9 +18,12 @@ configure_logging()
 app = FastAPI(
     title='Library Platform API',
     description=(
-        'A comprehensive REST API for managing books and authors in a library system. '
-        'This API provides endpoints for author registration, authentication, book management, '
-        'and bulk import functionality. Built with FastAPI, SQLAlchemy, and PostgreSQL.'
+        'A comprehensive REST API for managing books and '
+        'uthors in a library system. '
+        'This API provides endpoints for author registration,'
+        ' authentication, book management, '
+        'and bulk import functionality.'
+        ' Built with FastAPI, SQLAlchemy, and PostgreSQL.'
     ),
     version='1.0.0',
     contact={
@@ -62,3 +66,12 @@ main_api_router.include_router(auth_router)
 main_api_router.include_router(books_router)
 
 app.include_router(main_api_router)
+
+
+@app.get('/health')
+async def health_check() -> JSONResponse:
+    """Health check endpoint for Docker healthcheck."""
+    return JSONResponse(
+        content={'status': 'healthy', 'service': 'LibraryPlatform API'},
+        status_code=200,
+    )
