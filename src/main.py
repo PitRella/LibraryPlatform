@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, FastAPI
+from fastapi.responses import JSONResponse
 
 from src.auth.router import auth_router
 from src.authors.router import author_router
@@ -65,3 +66,12 @@ main_api_router.include_router(auth_router)
 main_api_router.include_router(books_router)
 
 app.include_router(main_api_router)
+
+
+@app.get('/health')
+async def health_check() -> JSONResponse:
+    """Health check endpoint for Docker healthcheck."""
+    return JSONResponse(
+        content={'status': 'healthy', 'service': 'LibraryPlatform API'},
+        status_code=200
+    )
