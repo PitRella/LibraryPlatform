@@ -336,7 +336,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Serhii Kryvtsun**
 - GitHub: [@pitrella](https://github.com/pitrella)
-- Telegram: [@pitrella]
+- Telegram: [@pitrella](https://t.me/pitrella)
 
 ## 🙏 Acknowledgments
 
