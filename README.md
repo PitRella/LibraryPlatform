@@ -223,11 +223,8 @@ uv run pytest tests/unit/test_auth_services.py
 - `POST /api/v1/auth/logout` - Logout and invalidate tokens
 
 ### Authors
-- `GET /api/v1/authors/` - List all authors
 - `POST /api/v1/authors/` - Create new author
-- `GET /api/v1/authors/{id}` - Get author by ID
-- `PUT /api/v1/authors/{id}` - Update author
-- `DELETE /api/v1/authors/{id}` - Delete author
+
 
 ### Books
 - `GET /api/v1/books/` - List books with filtering
