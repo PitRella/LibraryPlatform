@@ -25,13 +25,13 @@ jobs:
         run: uv sync --group dev
 
       - name: Run ruff (lint)
-        run: uv run ruff check .
+        run: uv run ruff check src/
 
       - name: Run ruff (format check)
-        run: uv run ruff format --check .
+        run: uv run ruff format --check src/
 
       - name: Run mypy
-        run: uv run mypy --config-file pyproject.toml .
+        run: uv run mypy --config-file pyproject.toml src/
 
       - name: Check YAML syntax
         run: |
