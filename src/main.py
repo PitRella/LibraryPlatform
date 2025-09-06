@@ -73,5 +73,5 @@ async def health_check() -> JSONResponse:
     """Health check endpoint for Docker healthcheck."""
     return JSONResponse(
         content={'status': 'healthy', 'service': 'LibraryPlatform API'},
-        status_code=200
+        status_code=200,
     )
